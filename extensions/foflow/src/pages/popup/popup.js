@@ -2,7 +2,7 @@
 // Everything deeper lives on the Time page, one click away.
 import { focusCard } from "../../ui/focus-card.js";
 import { siteList } from "../../ui/sites.js";
-import { el, fill, glyphs, iconButton } from "../../ui/dom.js";
+import { el, fill, glyphs, iconButton, mark } from "../../ui/dom.js";
 import { themeButton } from "../../ui/theme.js";
 import { m } from "../../lib/messages.js";
 import { duration } from "../../lib/time.js";
@@ -21,6 +21,12 @@ let focusDays = [];
 
 // The header carries the same two controls on every surface: the theme, and
 // the way to the bigger one. Settings lives on the Time page's toolbar.
+// The mark and the name are the header's business; the actions are appended
+// after them so the brand is the first thing on the surface.
+document.querySelector(".head .brand").replaceWith(
+  el("span", { class: "brand" }, mark(18), el("span", { text: "FoFlow" })),
+);
+
 document.getElementById("head-actions").append(
   themeButton(),
   iconButton(m("open_time"), glyphs.expand, {
@@ -106,7 +112,7 @@ function draw() {
       el("span", { class: "label", text: m("focus_focused") }),
     ),
   );
-  sites.update((report?.sites ?? []).slice(0, 4));
+  sites.update((report?.sites ?? []).slice(0, 4), total);
   fill(
     document.getElementById("local"),
     glyphs.lock(11),

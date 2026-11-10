@@ -5,6 +5,7 @@ export const M = {
   time_title: "Time",
   time_on_web: "on the web",
   time_sites: "Sites",
+  time_time: "Time",
   time_opens: "Opens",
   time_share: "Share",
   time_span_day: "Day",

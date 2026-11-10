@@ -50,7 +50,11 @@ export function engine({ session = null, empty = false } = {}) {
         buckets: Array.from({ length: 24 }, (_, hour) => (hour === 9 ? 3480 : 0)),
         total: 3480,
         previous: 0,
-        sites: [{ site: "youtube.com", seconds: 3480, opens: 3, series: Array(24).fill(0) }],
+        sites: [
+          { site: "youtube.com", seconds: 2100, opens: 3, series: Array(24).fill(0) },
+          { site: "github.com", seconds: 900, opens: 11, series: Array(24).fill(0) },
+          { site: "news.ycombinator.com", seconds: 480, opens: 7, series: Array(24).fill(0) },
+        ],
         suggestions: ["youtube.com"],
       };
   const storage = {};

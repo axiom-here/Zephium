@@ -100,10 +100,21 @@ the port is honest about them rather than pretending otherwise:
 - **Bounded.** At most 256 shut sites, 400 sites a day, 32 allowances a round,
   366 days of focus figures, and a retention setting for counted time.
 - **One component layer.** `src/styles/tokens.css` holds the palette, the type
-  scale, the radii and the motion; `src/styles/ui.css` holds every component
-  (card, button, field, switch, segmented control, menu, site mark). A page
-  stylesheet only adds layout. Nothing is styled in a page that another page
-  needs — that is exactly how the popup once shipped with no layout at all.
+  scale, the spacing ladder (`--space-1` … `--space-9`), the radii and the
+  motion; `src/styles/ui.css` holds every component — card, button, field,
+  switch, segmented control, menu, ring, focus card, figures, sites list, shut
+  editor, site mark. A page stylesheet only lays those out, and a test fails if
+  one restyles a shared component. Nothing is styled in a page that another
+  page needs — that is exactly how the popup once shipped with no layout at
+  all, and how its dial once shipped as a filled black disc.
+- **The chart is a shape, not a row of sticks.** A filled area under a hairline
+  curve, a marker on the hour that is happening, a dashed average, and a quiet
+  axis. It reads when most hours are empty, which is what a real day of
+  browsing looks like.
+- **The mark.** `assets/icon.svg` (and a heavier `icon-small.svg` for 16–32px)
+  is a focus ring with a breathing gap: the accent runs the leading quarter and
+  the ink runs the rest. The PNGs are rendered from it, and the same ring, drawn
+  inline, is the brand in the popup and settings.
 - **No OS widgets.** Choices are drawn by `src/ui/menu.js`, appended to the
   body and placed against its trigger, so a menu is the extension's own and is
   never clipped by a card or a 340px popup. A native `<select>` would follow

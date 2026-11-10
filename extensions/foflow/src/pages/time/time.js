@@ -258,7 +258,9 @@ function draw() {
     fill($("site-mark"), siteMark(site, 22));
     $("site-name").textContent = site;
   }
+  state.total = sum;
   $("total").textContent = duration(sum);
+  $("sites-caption").textContent = site === null ? "" : m("time_site_total", { site });
   $("sub").textContent = site !== null ? m("time_site_total", { site }) : m("time_on_web");
 
   const change = site === null && report ? comparison(period, sum, report.previous ?? 0) : null;
@@ -280,7 +282,7 @@ function draw() {
 
   drawChart();
   drawSiteActions();
-  sitesView.update(report?.sites ?? []);
+  sitesView.update(report?.sites ?? [], sum);
 
   const focused = state.focusDays.reduce(
     (sums, day) => ({
@@ -324,6 +326,7 @@ function drawChart() {
     height: 196,
     label: period.span === "day" ? m("time_chart_day") : m("time_chart_week"),
     describe: (index) => describeBucket(period, index),
+    summary: duration(state.total ?? 0),
   });
   if (chartNode) chartNode.replaceWith(next);
   else $("chart").append(next);

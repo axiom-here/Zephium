@@ -2,7 +2,7 @@
 // rows, each one a label, a line of help, and a control at the end. The theme
 // is a real menu rather than the browser's own select, so it matches the
 // extension and follows the chosen theme.
-import { el, fill, glyphs, iconButton } from "../../ui/dom.js";
+import { el, fill, glyphs, iconButton, mark } from "../../ui/dom.js";
 import { themeButton, THEMES } from "../../ui/theme.js";
 import { openMenu, isOpen } from "../../ui/menu.js";
 import { m } from "../../lib/messages.js";
@@ -22,6 +22,8 @@ let theme = document.documentElement.dataset.themeChoice ?? "system";
 // ------------------------------------------------------------------- chrome
 
 {
+  const head = document.querySelector(".head h1");
+  if (head) head.append(mark(24), el("span", { text: "FoFlow" }));
   const back = $("back");
   back.querySelector(".arrow").append(glyphs.arrowLeft(15));
   back.addEventListener("click", () => {

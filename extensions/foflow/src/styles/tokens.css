@@ -76,6 +76,17 @@
   --text-page-title: 14px;
   --text-title: 22px;
   --text-display: 36px;
+  --text-display-lg: 44px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
+  --space-9: 56px;
 
   --field-height: 26px;
   --row-height: 46px;

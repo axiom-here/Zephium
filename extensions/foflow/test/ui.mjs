@@ -29,7 +29,11 @@ test("the popup gets its own width and layout, not a bare document", { skip }, a
   const { document } = await open("src/pages/popup/popup.html");
   assert.deepEqual(declaration(document, "body", "inline-size"), ["340px"]);
   assert.deepEqual(declaration(document, ".popup", "display"), ["grid"]);
-  assert.deepEqual(declaration(document, ".stats", "display"), ["flex"]);
+  // The figures are laid out by the popup itself, on the shared card skin.
+  // The popup's figures are its own variant of the shared card.
+  assert.deepEqual(declaration(document, ".stats.two", "grid-template-columns"), [
+    "repeat(2, minmax(0px, 1fr))",
+  ]);
 });
 
 test("the focus dial is a ring, never a filled disc", { skip }, async () => {
@@ -267,9 +271,10 @@ test("the cover says why, how long, and offers both ways out", { skip }, async (
 test("a first run reads as empty, not as broken", { skip }, async () => {
   const { document } = await open("src/pages/time/time.html", { empty: true });
   assert.equal(document.querySelector("#total").textContent.trim(), "0m");
-  // The chart is still a full day of empty columns, not a blank box.
-  assert.equal(document.querySelectorAll(".bars .column").length, 24);
-  assert.equal(document.querySelectorAll(".bars .ticks span").length, 8);
+  // The chart is still a full day, not a blank box.
+  assert.equal(document.querySelectorAll(".plot .marker").length, 24);
+  assert.equal(document.querySelectorAll(".plot .ticks span").length, 8);
+  assert.ok(document.querySelector(".plot .shape"), "the empty day still has its area");
   // An empty list shows its empty state and no column header over it.
   assert.match(text(document.querySelector("#sites")), /Nothing counted yet/u);
   assert.equal(document.querySelectorAll("#sites .head").length, 0);
@@ -313,7 +318,23 @@ test("every stylesheet survives parsing, and shared components stay shared", { s
 
   // The popup once shipped unstyled because a card's rules lived in the Time
   // page's stylesheet. Component rules belong to ui.css and nowhere else.
-  const shared = [".menu", ".button", ".switch", ".field", ".segmented button", ".ring svg", ".ring .arc"];
+  const shared = [
+    ".menu",
+    ".button",
+    ".switch",
+    ".field",
+    ".segmented button",
+    ".ring svg",
+    ".ring .arc",
+    ".sites",
+    ".sites .row",
+    ".sites .head",
+    ".sites .row .meter",
+    ".focus",
+    ".focus .body",
+    ".shut-editor",
+    ".stats",
+  ];
   for (const sheet of sheets.slice(2)) {
     const css = readFileSync(join(ROOT, sheet), "utf8").replace(/\/\*[\s\S]*?\*\//gu, "");
     const selectors = new Set(

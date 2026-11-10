@@ -116,6 +116,29 @@ function iconUrl(site) {
 }
 
 /** Inline SVG glyphs, so nothing is fetched and nothing is missing. */
+/** The extension's own mark, drawn inline so it follows the theme's ink. */
+export function mark(size = 18) {
+  return svg(
+    "svg",
+    { viewBox: "0 0 32 32", width: size, height: size, "aria-hidden": "true", class: "mark" },
+    svg("rect", { x: 0, y: 0, width: 32, height: 32, rx: 8, fill: "currentColor", opacity: "0.1" }),
+    svg("g", { transform: "rotate(-90 16 16)" }, [
+      svg("circle", { cx: 16, cy: 16, r: 8, fill: "none", stroke: "currentColor", "stroke-opacity": "0.28", "stroke-width": "2.6" }),
+      svg("circle", {
+        cx: 16,
+        cy: 16,
+        r: 8,
+        fill: "none",
+        stroke: "currentColor",
+        "stroke-width": "2.6",
+        "stroke-linecap": "round",
+        "stroke-dasharray": "15.4 34.9",
+      }),
+    ]),
+    svg("circle", { cx: 16, cy: 16, r: 2.4, fill: "currentColor" }),
+  );
+}
+
 export const glyphs = {
   plus: (size = 14) =>
     svg(

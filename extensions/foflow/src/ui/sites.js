@@ -10,7 +10,7 @@ const percent = new Intl.NumberFormat(undefined, {
   maximumFractionDigits: 0,
 });
 
-export function siteList({ sites, total, size = "panel", selected = null, onselect, onpoint }) {
+export function siteList({ sites, total = 0, size = "panel", selected = null, onselect, onpoint }) {
   const root = el("ul", { class: `sites ${size === "page" ? "page" : ""}`, "aria-label": m("time_sites") });
 
   function render() {
@@ -21,10 +21,10 @@ export function siteList({ sites, total, size = "panel", selected = null, onsele
           "li",
           { class: "head", "aria-hidden": "true" },
           el("span"),
-          el("span", { text: m("time_sites") }),
+          el("span"),
           el("span", { text: m("time_opens") }),
           el("span", { text: m("time_share") }),
-          el("span"),
+          el("span", { text: m("time_time") }),
         ),
       );
     }
@@ -81,8 +81,11 @@ export function siteList({ sites, total, size = "panel", selected = null, onsele
   render();
   return {
     root,
-    update(next) {
+    /** Replaces the rows, and the total their shares are measured against —
+     *  a share of a total captured at construction is a share of nothing. */
+    update(next, nextTotal = total) {
       sites = next;
+      total = nextTotal;
       render();
     },
   };

@@ -98,8 +98,9 @@ test("the name is FoFlow everywhere a person sees it", () => {
     const html = readFileSync(page, "utf8");
     assert.ok(!/Zephium Focus/u.test(html), `${relative(ROOT, page)} still says Zephium Focus`);
   }
-  const options = readFileSync(join(ROOT, "src/pages/options/options.html"), "utf8");
-  assert.match(options, /<h1>FoFlow<\/h1>/u);
+  // Settings draws its mark and name in its own heading.
+  const options = readFileSync(join(ROOT, "src/pages/options/options.js"), "utf8");
+  assert.match(options, /el\("span", \{ text: "FoFlow" \}\)/u);
 });
 
 test("every message a page sends has a handler in the worker", () => {

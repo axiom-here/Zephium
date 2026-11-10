@@ -12,10 +12,16 @@ import { open, settle, skip, text } from "./dom.mjs";
 test("the Time page draws a day, a site list and the focus card", { skip }, async () => {
   const { document } = await open("src/pages/time/time.html");
   assert.match(text(document.querySelector("#total")), /58/);
-  assert.equal(document.querySelectorAll("#sites .row").length, 1);
+  assert.equal(document.querySelectorAll("#sites .row").length, 3);
   assert.match(text(document.querySelector("#sites")), /youtube\.com/u);
-  assert.equal(document.querySelectorAll(".bars .column").length, 24);
-  assert.equal(document.querySelectorAll(".bars .ticks span").length, 8);
+  // 2100 of 3480 is 60%, so a share is a real percentage, not a rounding artefact.
+  assert.match(text(document.querySelector("#sites")), /60%/u, "a share reads as a share");
+  assert.match(text(document.querySelector("#sites")), /26%/u);
+  // The day is one filled area with a marker per hour.
+  assert.equal(document.querySelectorAll(".plot .marker").length, 24);
+  assert.equal(document.querySelectorAll(".plot .ticks span").length, 8);
+  assert.match(document.querySelector(".plot .line").getAttribute("d"), /^M[\d.]+,[\d.]+ C/u);
+  assert.match(document.querySelector(".plot .fill-area").getAttribute("d"), /Z$/u);
   assert.match(text(document.querySelector("#focus")), /Start focus/u);
   assert.equal(document.querySelectorAll("#shut-editor .shut-list li").length, 1);
 });
@@ -88,7 +94,7 @@ test("the toolbar popup shows focus, today's time and the top sites", { skip }, 
   const { document } = await open("src/pages/popup/popup.html");
   assert.match(text(document.querySelector("#focus")), /Start focus/u);
   assert.match(text(document.querySelector("#stats")), /on the web/u);
-  assert.equal(document.querySelectorAll("#sites .row").length, 1);
+  assert.equal(document.querySelectorAll("#sites .row").length, 3);
   assert.match(text(document.body), /Counted on this device only/u);
   // The two header controls, which used to be missing altogether.
   assert.equal(document.querySelectorAll("#head-actions .icon-button").length, 2);

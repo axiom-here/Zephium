@@ -25,6 +25,10 @@
         z-index: 20;
       }
 
+      .demo-mark {
+        border-radius: 4px;
+      }
+
       .demo-note .link {
         padding: 3px 9px;
         border: 0;
@@ -83,17 +87,21 @@
                 </div>
               </div>
               <div class="figures">
-                <div class="figure">
-                  <p class="total" id="total">0m</p>
+                <p class="total" id="total">0m</p>
+                <div class="aside-figure">
                   <p class="sub" id="sub">on the web</p>
+                  <p class="change" id="change"></p>
                 </div>
-                <p class="change" id="change"></p>
               </div>
-              <div id="chart"></div>
+              <div class="chart" id="chart"></div>
               <div class="site-actions" id="site-actions" hidden></div>
             </section>
 
             <section class="card sites" id="sites-card">
+              <header class="card-head">
+                <h2>Sites</h2>
+                <p class="caption" id="sites-caption"></p>
+              </header>
               <div id="sites"></div>
             </section>
           </div>
@@ -127,7 +135,7 @@
       </div>
     </main>
 
-    <p class="demo-note">Preview with sample data · <button type="button" class="link" id="cycle-theme">Change theme</button></p>
+    <p class="demo-note"><img class="demo-mark" src="../assets/icons/32.png" alt="" width="16" height="16" />Preview with sample data · <button type="button" class="link" id="cycle-theme">Change theme</button></p>
     <script type="module" src="demo.js"></script>
   </body>
 </html>
