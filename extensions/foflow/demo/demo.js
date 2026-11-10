@@ -107,23 +107,22 @@ const reply = (message) => {
   }
 };
 
-window.chrome = {
+// This page is served over HTTP, where the extension's APIs are not injected;
+// a stand-in is installed before the page module is imported. `src/` only ever
+// reaches `chrome` inside functions, never at module load.
+globalThis.chrome = {
   runtime: {
     id: "preview",
     lastError: null,
-    getURL: (path) => new URL(`../${path}`, location.href).href,
+    getURL: (path) => new URL(`../${path}`, globalThis.location.href).href,
     onMessage: { addListener() {} },
     openOptionsPage() {},
     sendMessage(message, callback) {
       setTimeout(() => callback?.(reply(message)), 0);
     },
   },
-  tabs: { create: async ({ url }) => window.open(url, "_blank", "noopener") },
+  tabs: { create: async ({ url }) => globalThis.window.open(url, "_blank", "noopener") },
 };
 
-// Take the real page's markup, so the preview cannot drift from what ships.
-const response = await fetch("../src/pages/time/time.html");
-const markup = await response.text();
-const parsed = new DOMParser().parseFromString(markup, "text/html");
-document.getElementById("host").replaceWith(parsed.body);
+document.getElementById("span")?.setAttribute("data-preview", "true");
 await import("../src/pages/time/time.js");

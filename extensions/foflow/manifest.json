@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Zephium Focus",
-  "short_name": "Focus",
-  "version": "1.0.0",
+  "name": "FoFlow",
+  "short_name": "FoFlow",
+  "version": "1.0.1",
   "description": "Focus rounds that shut chosen sites, and a Time page that shows where the time went. Counted on this device only.",
   "minimum_chrome_version": "116",
   "icons": {
@@ -12,7 +12,7 @@
     "128": "assets/icons/128.png"
   },
   "action": {
-    "default_title": "Focus",
+    "default_title": "FoFlow",
     "default_popup": "src/pages/popup/popup.html",
     "default_icon": {
       "16": "assets/icons/16.png",

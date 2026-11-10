@@ -49,5 +49,5 @@ const server = createServer(async (request, response) => {
 });
 
 server.listen(PORT, "0.0.0.0", () => {
-  console.log(`Zephium Focus preview on http://0.0.0.0:${PORT}/`);
+  console.log(`FoFlow preview on http://0.0.0.0:${PORT}/`);
 });

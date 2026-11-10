@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FoFlow — preview</title>
+    <link rel="stylesheet" href="../src/styles/tokens.css" />
+    <link rel="stylesheet" href="../src/pages/time/time.css" />
+    <style>
+      .demo-note {
+        position: fixed;
+        inset-block-end: 12px;
+        inset-inline-end: 12px;
+        padding: 6px 10px;
+        border-radius: var(--radius-capsule);
+        background: var(--color-surface);
+        box-shadow: var(--row-rim);
+        color: var(--color-muted);
+        font-size: var(--text-caption);
+        z-index: 20;
+      }
+    </style>
+  </head>
+  <body>
+    <!--
+      A preview of the Time page with sample figures, built from the same
+      modules and styles the extension ships. It carries the page's markup
+      itself rather than fetching it, so it renders from any static server.
+
+        node extensions/foflow/scripts/serve.mjs
+    -->
+    <header class="toolbar">
+      <button type="button" class="icon-button back" id="back" aria-label="Back">
+        <span class="arrow" aria-hidden="true"></span>
+      </button>
+      <h1>Time</h1>
+      <div class="toolbar-end">
+        <button type="button" class="icon-button" id="settings-open" aria-label="Settings">
+          <span class="glyph" aria-hidden="true"></span>
+        </button>
+      </div>
+    </header>
+
+    <main class="scroller">
+      <div class="column">
+        <div class="controls">
+          <div class="segmented" id="span" role="group" aria-label="Period">
+            <button type="button" data-span="day" aria-pressed="true">Day</button>
+            <button type="button" data-span="week" aria-pressed="false">Week</button>
+          </div>
+          <div class="stepper">
+            <button type="button" class="icon-button" id="previous" aria-label="Previous day"></button>
+            <span class="period" id="period-label">Today</span>
+            <button type="button" class="icon-button" id="next" aria-label="Next day"></button>
+          </div>
+          <button type="button" class="button ghost" id="today" hidden>Back to today</button>
+        </div>
+
+        <div class="layout">
+          <div class="main">
+            <section class="card page overview">
+              <div class="site-head" id="site-head" hidden>
+                <button type="button" class="crumb" id="crumb"></button>
+                <div class="site-title">
+                  <span id="site-mark"></span>
+                  <h2 id="site-name"></h2>
+                </div>
+              </div>
+              <div class="figures">
+                <div class="figure">
+                  <p class="total" id="total">0m</p>
+                  <p class="sub" id="sub">on the web</p>
+                </div>
+                <p class="change" id="change"></p>
+              </div>
+              <div id="chart"></div>
+              <div class="site-actions" id="site-actions" hidden></div>
+            </section>
+
+            <section class="card sites" id="sites-card">
+              <div id="sites"></div>
+            </section>
+          </div>
+
+          <aside class="side">
+            <div id="focus"></div>
+            <section class="card stats" id="stats" aria-label="Focus" hidden>
+              <div>
+                <span class="stat" id="stat-focused">0m</span>
+                <span class="label">Focused</span>
+              </div>
+              <div>
+                <span class="stat" id="stat-sessions">0</span>
+                <span class="label">Sessions</span>
+              </div>
+              <div>
+                <span class="stat" id="stat-completed">0</span>
+                <span class="label">Completed</span>
+              </div>
+            </section>
+            <section class="card shut" id="shut-card">
+              <h3>Shut during focus</h3>
+              <p class="help">
+                These sites stay closed while a focus round runs. Breaks open them again.
+              </p>
+              <div id="shut-editor"></div>
+            </section>
+            <p class="local"><span class="lock" aria-hidden="true"></span>Counted on this device only</p>
+          </aside>
+        </div>
+      </div>
+    </main>
+
+    <p class="demo-note">Preview with sample data</p>
+    <script type="module" src="demo.js"></script>
+  </body>
+</html>

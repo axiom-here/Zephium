@@ -1,8 +1,8 @@
-# Zephium Focus
+# FoFlow
 
-The Zephium browser's **Focus** and **Time** surfaces, as a Chromium extension:
-focus rounds that keep chosen sites shut, and a Time page that shows where the
-time on the web went.
+The Zephium browser's **Focus** and **Time** surfaces, as a Chromium extension
+named FoFlow: focus rounds that keep chosen sites shut, and a Time page that
+shows where the time on the web went.
 
 It is a port of the browser's own implementation, not a look-alike:
 
@@ -54,7 +54,8 @@ and nothing is sent anywhere.
 
 1. Open `chrome://extensions`.
 2. Turn on **Developer mode**.
-3. Choose **Load unpacked** and select this `extensions/zephium-focus` folder.
+3. Choose **Load unpacked** and select this `extensions/foflow` folder
+   (the folder with `manifest.json` directly inside it).
 
 Chrome 116 or newer, and the Chromium browsers built on it: Edge, Brave, Arc,
 Vivaldi, Opera, and so on.
@@ -99,13 +100,29 @@ the port is honest about them rather than pretending otherwise:
 - **Bounded.** At most 256 shut sites, 400 sites a day, 32 allowances a round,
   366 days of focus figures, and a retention setting for counted time.
 
+## Preview
+
+The Time page with sample figures, from the same modules and styles, over HTTP:
+
+```sh
+node extensions/foflow/scripts/serve.mjs
+# http://localhost:4173/
+```
+
 ## Checks
 
 ```sh
-node extensions/zephium-focus/test/run.mjs        # domain logic, no dependencies
+node extensions/foflow/test/run.mjs         # domain logic, no dependencies
+node extensions/foflow/test/package.mjs     # the package the browser loads
 npm install --no-save jsdom
-node --test-force-exit --test extensions/zephium-focus/test/browser.mjs
+node --test-force-exit --test extensions/foflow/test/browser.mjs
 ```
+
+`test/package.mjs` is the one that catches the failure a person sees first:
+every file the manifest names, and every path the code hands to
+`chrome.runtime.getURL`, must exist — a stale path is `ERR_FILE_NOT_FOUND` in the
+browser and invisible to every other test. It also checks that every page's
+stylesheet, script and icon link resolves.
 
 The first suite covers the phase machine, the gate, allowances, site matching,
 the ledger, the flush and the report — the places where a port drifts, including

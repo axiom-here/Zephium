@@ -1,10 +1,10 @@
 {
-  "name": "zephium-focus",
+  "name": "foflow",
   "private": true,
   "type": "module",
   "version": "1.0.0",
   "description": "The Zephium browser's Focus and Time surfaces, as a Chromium extension.",
   "scripts": {
-    "test": "node --test test/run.mjs"
+    "test": "node --test test/run.mjs test/package.mjs"
   }
 }

@@ -318,6 +318,11 @@ export function focusCard({
   return {
     root,
     draw,
+    /** A surface that read the engine's own failure flag says so here. */
+    setFailed(shown) {
+      refused = Boolean(shown);
+      failed.hidden = !refused;
+    },
     dispose() {
       if (timer !== null) clearInterval(timer);
       document.removeEventListener("visibilitychange", pace);

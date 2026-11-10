@@ -2,9 +2,9 @@
 // wiring between the pages and the engine is exercised as well as the domain
 // logic in `run.mjs`.
 //
-//   node extensions/zephium-focus/test/run.mjs       (no dependencies)
+//   node extensions/foflow/test/run.mjs       (no dependencies)
 //   npm install --no-save jsdom && \
-//   node extensions/zephium-focus/test/browser.mjs  (this file)
+//   node extensions/foflow/test/browser.mjs  (this file)
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";

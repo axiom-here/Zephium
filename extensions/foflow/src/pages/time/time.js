@@ -296,6 +296,7 @@ function draw() {
   $("stat-completed").textContent = String(focused.completed);
 
   editor.render();
+  focus.setFailed(state.snapshot?.failed === true);
   focus.draw();
 }
 

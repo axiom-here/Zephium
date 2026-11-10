@@ -1,4 +1,4 @@
-// Run with: node extensions/zephium-focus/test/run.mjs
+// Run with: node extensions/foflow/test/run.mjs
 // The suite covers the places a port drifts: the phase machine, the gate,
 // allowances, site matching, the ledger and the report shape.
 import assert from "node:assert/strict";
@@ -23,7 +23,7 @@ import {
 } from "../src/lib/focus.js";
 import { normalizeSite, siteCovers, siteOf } from "../src/lib/site.js";
 import { duration, countdown, currentPeriod, liveBucket, localDay, weekStart } from "../src/lib/time.js";
-import { cleanSettings, report, spend, countOpen, flushLedger, suggestions } from "./fixtures.js";
+import { cleanSettings, report, spend, countOpen, flushLedger, suggestions } from "./shim.js";
 
 const MIN = 60_000;
 

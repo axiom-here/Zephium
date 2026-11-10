@@ -21,7 +21,7 @@ const { flush, loadSession, saveSession } = store;
 import { m } from "../lib/messages.js";
 import { localDay, seconds, weekStart, HOUR_MS } from "../lib/time.js";
 
-const TICK_ALARM = "zephium-focus-tick";
+const TICK_ALARM = "foflow-tick";
 /** How often counted time is written down, matching the browser's own minute. */
 const FLUSH_MS = 30_000;
 
@@ -126,7 +126,7 @@ function scheduleTick() {
 }
 
 function schedulePhaseAlarm() {
-  const name = "zephium-focus-phase";
+  const name = "foflow-phase";
   if (session === null) {
     void chrome.alarms.clear(name);
     return;
@@ -139,7 +139,7 @@ chrome.runtime.onInstalled.addListener(() => {
   void boot();
   // Where the Time page lives is a launch argument in the browser; here it is
   // one click away the first time.
-  void chrome.tabs.create({ url: chrome.runtime.getURL("pages/time/time.html") });
+  void chrome.tabs.create({ url: chrome.runtime.getURL("src/pages/time/time.html") });
 });
 chrome.runtime.onStartup.addListener(() => void boot());
 
@@ -512,7 +512,7 @@ async function releaseCovers({ onlyShutPages = true } = {}) {
     await saveCovers();
     try {
       const tab = await chrome.tabs.get(tabId);
-      if (tab.url?.startsWith(chrome.runtime.getURL("pages/cover/"))) {
+      if (tab.url?.startsWith(chrome.runtime.getURL("src/pages/cover/"))) {
         await chrome.tabs.update(tabId, { url: entry.url });
       }
     } catch {
@@ -570,7 +570,7 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
     if (session !== null) updateBadge();
     return;
   }
-  if (alarm.name === "zephium-focus-phase") {
+  if (alarm.name === "foflow-phase") {
     await step();
     await flushLedger();
   }
@@ -595,7 +595,7 @@ const handlers = {
     return { ok: true };
   },
   "time:open": async ({ span } = {}) => {
-    const url = chrome.runtime.getURL("pages/time/time.html");
+    const url = chrome.runtime.getURL("src/pages/time/time.html");
     const existing = await chrome.tabs.query({ url: `${url}*` });
     if (existing[0]?.id) {
       await chrome.tabs.update(existing[0].id, { active: true });
