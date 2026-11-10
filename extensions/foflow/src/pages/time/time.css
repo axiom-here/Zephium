@@ -45,12 +45,25 @@ body {
   display: inline-flex;
 }
 
-/* The Time page is the deepest surface, so its toolbar names the page rather
-   than the destination, the way a browser's own pages do. */
-.toolbar-title {
+/* The page owns its title; the toolbar is chrome and holds only the way back
+   and the two controls. */
+.page-head {
+  display: grid;
+  gap: 2px;
+  padding: var(--space-5) 0 var(--space-1);
+}
+
+.page-head h1 {
+  margin: 0;
+  font-size: var(--text-title);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.page-head .caption {
+  margin: 0;
   color: var(--color-muted);
   font-size: var(--text-body);
-  font-weight: 500;
 }
 
 .toolbar-end {

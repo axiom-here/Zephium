@@ -609,7 +609,7 @@ textarea {
 }
 
 .focus .length {
-  font-size: 38px;
+  font-size: 44px;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.03em;
@@ -625,7 +625,7 @@ textarea {
 }
 
 .focus .clock {
-  font-size: 30px;
+  font-size: 34px;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;

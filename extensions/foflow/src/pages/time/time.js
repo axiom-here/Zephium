@@ -46,7 +46,7 @@ function bootToolbar() {
   back.querySelector(".arrow").append(glyphs.arrowLeft(15));
   back.setAttribute("aria-label", m("back"));
   back.setAttribute("title", m("back"));
-  $("toolbar-title").textContent = m("time_title");
+  $("page-title").textContent = m("time_title");
   back.addEventListener("click", () => {
     // Opened from the toolbar or a first run, so the browser's own history
     // decides where back is; a tab with none closes instead.
@@ -261,6 +261,7 @@ function draw() {
   state.total = sum;
   $("total").textContent = duration(sum);
   $("sites-caption").textContent = site === null ? "" : m("time_site_total", { site });
+  $("page-sub").textContent = site === null ? m("time_on_web") : m("time_site_total", { site });
   $("sub").textContent = site !== null ? m("time_site_total", { site }) : m("time_on_web");
 
   const change = site === null && report ? comparison(period, sum, report.previous ?? 0) : null;

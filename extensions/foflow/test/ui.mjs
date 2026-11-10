@@ -63,7 +63,7 @@ test("the Time page's back button and settings are both in the toolbar", { skip 
   assert.ok(back, "a back button exists");
   assert.equal(back.getAttribute("aria-label"), "Back", "it is labelled for a screen reader");
   assert.ok(back.querySelector(".arrow svg"), "the arrow is drawn");
-  assert.equal(document.querySelector("#toolbar-title").textContent.trim(), "Time");
+  assert.equal(document.querySelector("#page-title").textContent.trim(), "Time");
   const end = document.querySelectorAll("#toolbar-end .icon-button");
   assert.equal(end.length, 2, "theme and settings");
   assert.ok(
@@ -283,6 +283,20 @@ test("a first run reads as empty, not as broken", { skip }, async () => {
   const popup = await open("src/pages/popup/popup.html", { empty: true });
   assert.match(text(popup.document.querySelector("#stats")), /0m/u);
   assert.match(text(popup.document.querySelector("#sites")), /Nothing counted yet|Time on the web/u);
+});
+
+test("a period you are not in says so, and offers the way back", { skip }, async () => {
+  const { document } = await open("src/pages/time/time.html");
+  const back = document.querySelector("#today");
+  assert.equal(back.hidden, true, "today has nothing to go back to");
+  document.querySelector("#previous").click();
+  await settle(200);
+  assert.equal(document.querySelector("#period-label").textContent.trim(), "Yesterday");
+  assert.equal(back.hidden, false, "a past day offers the way back");
+  back.click();
+  await settle(200);
+  assert.equal(back.hidden, true);
+  assert.equal(document.querySelector("#period-label").textContent.trim(), "Today");
 });
 
 test("every stylesheet survives parsing, and shared components stay shared", { skip }, async () => {
