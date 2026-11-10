@@ -150,3 +150,19 @@ test("every page boots its theme before it paints", () => {
     );
   }
 });
+
+test("no string is written twice, and none is left unused", () => {
+  const messages = readFileSync(join(ROOT, "src/lib/messages.js"), "utf8");
+  const keys = [...messages.matchAll(/^\s{2}([a-z_0-9]+):/gmu)].map((match) => match[1]);
+  const duplicates = keys.filter((key, index) => keys.indexOf(key) !== index);
+  assert.deepEqual(duplicates, [], "the same key is defined twice");
+
+  const used = new Set();
+  for (const file of sources) {
+    for (const match of readFileSync(file, "utf8").matchAll(/m\(\s*"([a-z_0-9]+)"/gu)) used.add(match[1]);
+  }
+  // Retention and names are reached through a built key, not a literal.
+  const built = keys.filter((key) => /^(retention_|time_|focus_)/u.test(key));
+  const unused = keys.filter((key) => !used.has(key) && !built.includes(key));
+  assert.deepEqual(unused, [], "a string is written but never shown");
+});

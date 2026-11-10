@@ -34,41 +34,8 @@ body {
   place-items: center;
 }
 
-.ring-wrap .ring {
-  position: relative;
-  display: inline-grid;
-  place-items: center;
-}
-
-.ring-wrap svg {
-  position: absolute;
-  inset: 0;
-  rotate: -90deg;
-}
-
-.ring-wrap .track {
-  fill: none;
-  stroke: var(--color-track);
-}
-
-.ring-wrap .arc {
-  fill: none;
-  stroke: var(--color-text);
-  stroke-linecap: round;
-  transition:
-    stroke-dashoffset 1s linear,
-    stroke var(--motion-slow) var(--ease-out);
-}
-
-.ring-wrap .rest .arc {
-  stroke: var(--color-accent);
-}
-
 .ring-wrap .center {
-  position: relative;
-  display: grid;
   gap: 2px;
-  place-items: center;
 }
 
 .clock {

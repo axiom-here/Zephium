@@ -128,7 +128,7 @@ function draw() {
       el("h2", { text: m("focus_title") }),
       row({
         label: m("focus_length"),
-        help: m("settings_back_help"),
+        help: m("settings_round_help"),
         control: minutes(),
       }),
       row({

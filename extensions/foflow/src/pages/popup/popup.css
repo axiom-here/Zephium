@@ -82,43 +82,6 @@ body {
   place-items: center;
 }
 
-.focus .dial .ring {
-  position: relative;
-  display: inline-grid;
-  place-items: center;
-}
-
-.focus .dial svg {
-  position: absolute;
-  inset: 0;
-  rotate: -90deg;
-}
-
-.focus .dial .track {
-  fill: none;
-  stroke: var(--color-track);
-}
-
-.focus .dial .arc {
-  fill: none;
-  stroke: var(--color-text);
-  stroke-linecap: round;
-  transition:
-    stroke-dashoffset 1s linear,
-    stroke var(--motion-slow) var(--ease-out);
-}
-
-.focus .dial.rest .arc {
-  stroke: var(--color-accent);
-}
-
-.focus .ring .center {
-  position: relative;
-  display: grid;
-  place-items: center;
-  text-align: center;
-}
-
 .focus .focus-length {
   position: absolute;
   inset: 50% auto auto 50%;

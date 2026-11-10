@@ -476,6 +476,50 @@ textarea {
   box-shadow: var(--shadow-field-focus);
 }
 
+/* ------------------------------------------------------------------- ring */
+
+/* The ring is drawn by its own svg and both circles are unfilled, so a dial is
+   never a filled disc. It is shared: the focus card, the popup and the cover
+   all render `ui/ring.js`, so how it looks cannot live in one page's stylesheet
+   — that is exactly the mistake that once left the popup with a black disc. */
+.ring {
+  position: relative;
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+}
+
+.ring svg {
+  position: absolute;
+  inset: 0;
+  rotate: -90deg;
+}
+
+.ring .track {
+  fill: none;
+  stroke: var(--color-track);
+}
+
+.ring .arc {
+  fill: none;
+  stroke: var(--color-text);
+  stroke-linecap: round;
+  transition:
+    stroke-dashoffset 1s linear,
+    stroke var(--motion-slow) var(--ease-out);
+}
+
+.ring.rest .arc {
+  stroke: var(--color-accent);
+}
+
+.ring .center {
+  position: relative;
+  display: grid;
+  place-items: center;
+  text-align: center;
+}
+
 /* --------------------------------------------------------------- favicons */
 
 .favicon {

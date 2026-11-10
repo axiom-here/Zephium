@@ -38,9 +38,11 @@ test("the focus dial is a ring, never a filled disc", { skip }, async () => {
   assert.ok(svg, "the dial draws an svg");
   assert.deepEqual([...svg.children].map((node) => node.tagName), ["circle", "circle"]);
   assert.equal(svg.querySelector(".track").getAttribute("fill"), null);
-  // Both circles are unfilled by rule, which is what stops the black disc.
-  assert.ok(declaration(document, ".focus .dial .track", "fill").includes("none"));
-  assert.ok(declaration(document, ".focus .dial .arc", "fill").includes("none"));
+  // Both circles are unfilled by rule, which is what stops the black disc —
+  // and that rule is shared, not copy-pasted into one page.
+  assert.deepEqual(declaration(document, ".ring .track", "fill"), ["none"]);
+  assert.deepEqual(declaration(document, ".ring .arc", "fill"), ["none"]);
+  assert.deepEqual(declaration(document, ".ring svg", "rotate"), ["-90deg"]);
 });
 
 test("every surface offers the theme and a way to the bigger one", { skip }, async () => {
@@ -85,6 +87,15 @@ test("the length menu is the extension's own, placed above the page", { skip }, 
     ["15 min", "25 min", "30 min", "45 min", "50 min", "60 min", "90 min", "Repeat with breaks"],
   );
   assert.ok(menu.style.left && menu.style.top, "it is placed against its trigger");
+  // The reference panel: a dot on the chosen row, a rule before the actions.
+  assert.equal(menu.querySelectorAll('[aria-checked="true"]').length, 1);
+  assert.match(menu.querySelector('[aria-checked="true"] .label').textContent, /^25 min$/u);
+  assert.equal(menu.querySelectorAll(".menu-separator").length, 1);
+  assert.equal(
+    menu.children[menu.children.length - 2].className,
+    "menu-separator",
+    "the separator sits directly above the last item",
+  );
   document.dispatchEvent(new window.KeyboardEvent("keydown", { key: "Escape" }));
   await settle();
   assert.equal(document.querySelector("body > .menu"), null, "escape closes it");
@@ -251,4 +262,48 @@ test("the cover says why, how long, and offers both ways out", { skip }, async (
   assert.match(body, /Allow 5 minutes/u);
   assert.match(body, /End focus/u);
   assert.ok(document.querySelector(".ring-wrap .ring svg"));
+});
+
+test("every stylesheet survives parsing, and shared components stay shared", { skip }, async () => {
+  const sheets = [
+    "src/styles/tokens.css",
+    "src/styles/ui.css",
+    "src/pages/time/time.css",
+    "src/pages/popup/popup.css",
+    "src/pages/options/options.css",
+    "src/pages/cover/cover.css",
+  ];
+  // Selectors jsdom normalizes on the way in, plus keyframe steps.
+  const squash = (selector) => selector.replace(/\s+/gu, " ").trim();
+  const normalized = new Set(["*, *::before, *::after", "50%", "0%, 100%"]);
+  for (const sheet of sheets) {
+    const css = readFileSync(join(ROOT, sheet), "utf8").replace(/\/\*[\s\S]*?\*\//gu, "");
+    const dom = new JSDOM(`<!doctype html><html><head><style>${css}</style></head><body></body></html>`);
+    const parsed = [...dom.window.document.styleSheets[0].cssRules];
+    const flatten = (rules) => rules.flatMap((rule) => (rule.cssRules?.length ? flatten([...rule.cssRules]) : [rule]));
+    const present = new Set(
+      flatten(parsed)
+        .filter((rule) => rule.selectorText)
+        .map((rule) => squash(rule.selectorText)),
+    );
+    const written = [...css.matchAll(/(?:^|\})\s*([^{}@;]+?)\s*\{/gu)]
+      .map((match) => squash(match[1]))
+      .filter((selector) => selector.length > 0);
+    // A syntax error drops everything after it, so the last rule is the witness.
+    assert.ok(present.has(written.at(-1)), `${sheet} parses to its last selector`);
+    const dropped = written.filter((selector) => !present.has(selector) && !normalized.has(selector));
+    assert.deepEqual(dropped, [], `${sheet} keeps every rule it writes`);
+  }
+
+  // The popup once shipped unstyled because a card's rules lived in the Time
+  // page's stylesheet. Component rules belong to ui.css and nowhere else.
+  const shared = [".menu", ".button", ".switch", ".field", ".segmented button", ".ring svg", ".ring .arc"];
+  for (const sheet of sheets.slice(2)) {
+    const css = readFileSync(join(ROOT, sheet), "utf8").replace(/\/\*[\s\S]*?\*\//gu, "");
+    const selectors = new Set(
+      [...css.matchAll(/(?:^|\})\s*([^{}@;]+?)\s*\{/gu)].map((match) => squash(match[1])),
+    );
+    const duplicated = shared.filter((selector) => selectors.has(selector));
+    assert.deepEqual(duplicated, [], `${sheet} does not restyle a shared component`);
+  }
 });
