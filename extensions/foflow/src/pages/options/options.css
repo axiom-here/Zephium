@@ -51,10 +51,10 @@ body {
 
 .column {
   display: grid;
-  gap: 18px;
+  gap: var(--space-5);
   max-inline-size: 640px;
   margin-inline: auto;
-  padding: 18px 20px 64px;
+  padding: var(--space-4) var(--space-5) var(--space-9);
 }
 
 .head h1 {
@@ -80,15 +80,15 @@ body {
 
 .group {
   display: grid;
-  gap: 1px;
-  padding: 6px;
+  gap: 2px;
+  padding: var(--space-2);
   border-radius: var(--radius-card);
   background: var(--color-card);
   box-shadow: var(--row-rim);
 }
 
 .group h2 {
-  margin: 8px 10px 6px;
+  margin: var(--space-2) var(--space-3) var(--space-1);
   color: var(--color-faint);
   font-size: var(--text-caption);
   font-weight: 500;
@@ -99,9 +99,9 @@ body {
 .row {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: var(--space-4);
   min-block-size: var(--row-height);
-  padding: 8px 10px;
+  padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-row);
 }
 

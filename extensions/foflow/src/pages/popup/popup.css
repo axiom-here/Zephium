@@ -45,14 +45,14 @@ body {
 .sites-card {
   display: grid;
   gap: 2px;
-  padding: 10px 6px 6px;
+  padding: var(--space-2) var(--space-2) var(--space-1);
   border-radius: var(--radius-card);
   background: var(--color-card);
   box-shadow: var(--row-rim);
 }
 
 .section-title {
-  margin: 0 6px 4px;
+  margin: 0 var(--space-2) var(--space-1);
   color: var(--color-faint);
   font-size: var(--text-caption);
   font-weight: 500;
