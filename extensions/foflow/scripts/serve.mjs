@@ -1,6 +1,6 @@
 // Serves the extension folder so the preview page can load the same modules the
 // extension ships. Dev only; nothing in the manifest refers to it.
-//   node extensions/zephium-focus/scripts/serve.mjs [port]
+//   node extensions/foflow/scripts/serve.mjs [port]
 import { createServer } from "node:http";
 import { readFile, stat } from "node:fs/promises";
 import { extname, join, normalize } from "node:path";
