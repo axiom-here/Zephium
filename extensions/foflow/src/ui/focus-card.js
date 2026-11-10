@@ -77,7 +77,7 @@ export function focusCard({
     if (now >= snap.session.phase_ends_ms) void actions.sync().then(onchange);
   }
 
-  const dialSize = () => (size === "page" ? 168 : 120);
+  const dialSize = () => (size === "page" ? 152 : 120);
   const dialStroke = () => (size === "page" ? 9 : 7);
 
   async function run(task) {

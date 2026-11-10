@@ -642,6 +642,26 @@ textarea {
   }
 }
 
+.focus.page .body {
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.focus.page .facts {
+  justify-items: center;
+  text-align: center;
+}
+
+.focus.page .actions {
+  justify-content: center;
+  margin-block-start: var(--space-1);
+}
+
+.focus.page .shut {
+  text-align: center;
+}
+
 .focus .facts {
   display: grid;
   gap: 3px;
