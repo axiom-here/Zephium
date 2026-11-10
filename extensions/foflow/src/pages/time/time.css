@@ -277,7 +277,7 @@ body {
 
 .plot {
   position: relative;
-  block-size: var(--plot-height);
+  block-size: var(--plot-height, 240px);
   margin-block-end: var(--plot-gap);
   outline: none;
   touch-action: pan-y;

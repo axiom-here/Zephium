@@ -66,9 +66,49 @@
   --shadow-float: 0 16px 40px rgb(0 0 0 / 0.5), 0 2px 8px rgb(0 0 0 / 0.34);
   --color-menu: #23262c;
   --color-menu-separator: rgb(255 255 255 / 0.09);
+
+  --radius-capsule: 999px;
+  --radius-control: 14px;
+  --radius-control-compact: 10px;
+  --radius-card: 18px;
+  --radius-row: 12px;
+  --radius-field: 10px;
+
+  --text-caption: 11px;
+  --text-label: 12px;
+  --text-body: 13px;
+  --text-page-title: 15px;
+  --text-title: 22px;
+  --text-display: 34px;
+  --text-display-lg: 44px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
+  --space-9: 56px;
+
+  --field-height: 30px;
+  --row-height: 46px;
+  --control-inset: 10px;
+
+  --motion-fast: 120ms;
+  --motion-slow: 300ms;
+  --motion-page: 400ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-emphasized: cubic-bezier(0.2, 0.9, 0.2, 1);
+
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI Variable Text", "Segoe UI", "Noto Sans",
+    "Cantarell", sans-serif;
 }
 
 /* Light, but only when the reader has not asked for an explicit dark theme. */
+
 @media (prefers-color-scheme: light) {
   :root:not([data-theme="dark"], [data-theme="mocha"]) {
     color-scheme: light;

@@ -65,6 +65,53 @@ test("the icons are the shipped mark, at the sizes the manifest promises", () =>
   }
 });
 
+test("every token the sheets use is defined, and every theme defines the same names", () => {
+  // A `var()` with no definition is not an error the browser reports: it just
+  // drops the declaration, so the page quietly loses its spacing or its ink.
+  const tokens = readFileSync(join(ROOT, "src/styles/tokens.css"), "utf8");
+  let depth = 0;
+  for (const char of tokens) {
+    if (char === "{") depth += 1;
+    if (char === "}") depth -= 1;
+    // Never deeper than a media query around a :root block.
+    assert.ok(depth >= 0 && depth <= 2, "tokens.css has a brace out of place");
+  }
+  assert.equal(depth, 0, "tokens.css has an unclosed block");
+
+  const defined = new Set([...tokens.matchAll(/^\s*--([\w-]+):/gmu)].map((match) => match[1]));
+  assert.ok(defined.size > 40, "expected the whole token set");
+
+  const sheets = ["src/styles/ui.css", "src/pages/time/time.css", "src/pages/popup/popup.css", "src/pages/options/options.css", "src/pages/cover/cover.css"];
+  for (const sheet of sheets) {
+    const css = readFileSync(join(ROOT, sheet), "utf8");
+    const local = new Set([...css.matchAll(/^\s*--([\w-]+):/gmu)].map((match) => match[1]));
+    const missing = new Set(
+      // A var with a fallback is a parameter the script fills in, not a token.
+      [...css.matchAll(/var\(--([\w-]+)([,)])/gu)]
+        .filter((match) => match[2] === ")")
+        .map((match) => match[1])
+        .filter((name) => !defined.has(name) && !local.has(name)),
+    );
+    assert.deepEqual([...missing], [], `${sheet} uses tokens nothing defines`);
+  }
+
+  // Every theme is a complete mirror: a name in the base with no value in a
+  // theme inherits the dark one, which is how a light page ends up with a
+  // dark menu.
+  const block = (start) => {
+    const from = tokens.indexOf(start);
+    const to = tokens.indexOf("\n}\n", from);
+    return new Set([...tokens.slice(from, to).matchAll(/^\s*--([\w-]+):/gmu)].map((match) => match[1]));
+  };
+  const base = block(":root {\n  color-scheme: dark;");
+  const themed = new Set([...base].filter((name) => name.startsWith("color-") || name.startsWith("shadow-")));
+  for (const theme of [':root[data-theme="light"] {', ':root[data-theme="mocha"] {']) {
+    const set = block(theme);
+    const missing = [...themed].filter((name) => !set.has(name));
+    assert.deepEqual(missing, [], `${theme} leaves these inheriting from dark`);
+  }
+});
+
 test("every path the code opens exists in the package", () => {
   const paths = referencedPaths();
   assert.ok(paths.length >= 2, "expected the worker to name at least the Time page and a cover");
