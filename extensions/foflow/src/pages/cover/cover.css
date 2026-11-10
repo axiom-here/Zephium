@@ -1,0 +1,91 @@
+/* The cover: one ring, the site it stands for, and the two ways out. */
+body {
+  display: grid;
+  place-items: center;
+  min-block-size: 100vh;
+  background: var(--color-page);
+}
+
+.center {
+  display: grid;
+  place-items: center;
+}
+
+.panel {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  max-inline-size: 460px;
+  padding: var(--space-8) var(--space-7);
+  text-align: center;
+  animation: arrive var(--motion-page) var(--ease-emphasized);
+}
+
+@keyframes arrive {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+.ring-wrap {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+}
+
+.ring-wrap .center {
+  gap: 2px;
+}
+
+.clock {
+  font-size: 32px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.left {
+  color: var(--color-muted);
+  font-size: var(--text-caption);
+}
+
+.site {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-block-start: 18px;
+  padding: 4px 10px 4px 6px;
+  border-radius: var(--radius-capsule);
+  background: var(--color-fill);
+  color: var(--color-label-secondary);
+  font-size: var(--text-label);
+}
+
+h1 {
+  margin: var(--space-1) 0 0;
+  font-size: var(--text-title);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+p {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: var(--text-body);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+  margin-block-start: var(--space-4);
+}
+
+/* The theme stays reachable even on a page about to be left behind. */
+body > .theme-button {
+  position: fixed;
+  inset-block-start: 14px;
+  inset-inline-end: 14px;
+}

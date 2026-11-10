@@ -1,0 +1,130 @@
+// Time in the toolbar: focus, today's figures, and where the time went.
+// Everything deeper lives on the Time page, one click away.
+import { focusCard } from "../../ui/focus-card.js";
+import { siteList } from "../../ui/sites.js";
+import { el, fill, glyphs, iconButton, mark } from "../../ui/dom.js";
+import { themeButton } from "../../ui/theme.js";
+import { m } from "../../lib/messages.js";
+import { duration } from "../../lib/time.js";
+
+const send = (message) =>
+  new Promise((resolve) => {
+    chrome.runtime.sendMessage(message, (reply) => {
+      if (chrome.runtime.lastError) resolve(null);
+      else resolve(reply ?? null);
+    });
+  });
+
+let snapshot = null;
+let report = null;
+let focusDays = [];
+
+// The header carries the same two controls on every surface: the theme, and
+// the way to the bigger one. Settings lives on the Time page's toolbar.
+// The mark and the name are the header's business; the actions are appended
+// after them so the brand is the first thing on the surface.
+document.querySelector(".head .brand").replaceWith(
+  el("span", { class: "brand" }, mark(18), el("span", { text: "FoFlow" })),
+);
+
+document.getElementById("head-actions").append(
+  themeButton(),
+  iconButton(m("open_time"), glyphs.expand, {
+    onclick: async () => {
+      await send({ type: "time:open" });
+      window.close();
+    },
+  }),
+);
+document.querySelector("#head-actions .icon-button:last-child").setAttribute(
+  "title",
+  m("open_time"),
+);
+
+const card = focusCard({
+  snapshot: () => snapshot ?? empty(),
+  update: async (patch) => {
+    const reply = await send({ type: "focus:settings", ...patch });
+    await refresh();
+    return reply;
+  },
+  actions: {
+    start: (minutes, breaks) => send({ type: "focus:start", minutes, breaks }).then(after),
+    stop: () => send({ type: "focus:stop" }).then(after),
+    skip: () => send({ type: "focus:skip" }).then(after),
+    sync: () => send({ type: "focus:snapshot" }).then(after),
+  },
+  size: "panel",
+  manageInPlace: true,
+  onchange: () => void refresh(),
+});
+document.getElementById("focus").append(card.root);
+
+const sites = siteList({ sites: [], total: 0, size: "panel" });
+document.getElementById("sites").append(sites.root);
+document.getElementById("sites-title").textContent = m("time_sites");
+
+function empty() {
+  return {
+    session: null,
+    minutes: 25,
+    breaks: false,
+    shut: [],
+    suggestions: [],
+    blocking: true,
+    tracking: true,
+  };
+}
+
+async function after(reply) {
+  await refresh();
+  return reply;
+}
+
+async function refresh() {
+  const [next, today, focused] = await Promise.all([
+    send({ type: "focus:snapshot" }),
+    send({ type: "time:report", span: "day" }),
+    send({ type: "time:focusDays", days: 1 }),
+  ]);
+  if (next) snapshot = next;
+  if (today) report = today;
+  if (focused?.days) focusDays = focused.days;
+  draw();
+}
+
+function draw() {
+  const total = report?.total ?? 0;
+  const day = focusDays[0] ?? { seconds: 0, sessions: 0, completed: 0 };
+  fill(document.getElementById("stats"));
+  document.getElementById("stats").append(
+    el(
+      "div",
+      { class: "stat" },
+      el("span", { class: "value", text: duration(total) }),
+      el("span", { class: "label", text: m("time_on_web") }),
+    ),
+    el("span", { class: "divider", "aria-hidden": "true" }),
+    el(
+      "div",
+      { class: "stat" },
+      el("span", { class: "value", text: duration(day.seconds) }),
+      el("span", { class: "label", text: m("focus_focused") }),
+    ),
+  );
+  sites.update((report?.sites ?? []).slice(0, 4), total);
+  fill(
+    document.getElementById("local"),
+    glyphs.lock(11),
+    el("span", { text: m("time_local_only") }),
+  );
+  card.draw();
+}
+
+chrome.runtime.onMessage.addListener((message) => {
+  if (message?.type !== "focus:changed") return;
+  snapshot = message.snapshot;
+  draw();
+});
+
+void refresh();

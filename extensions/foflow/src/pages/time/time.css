@@ -1,0 +1,420 @@
+/* The Time page, measured off the browser's own: a 1080px column, the chart
+   and sites on the left, focus and its shut sites on the right. Shared
+   components come from ui.css; this file only lays them out. */
+
+body {
+  min-block-size: 100vh;
+  background: var(--color-page);
+}
+
+/* "← Time", at the top of the page, with the two controls at the far edge.
+   Measured off the browser: 38px tall, the label at 24px from the left. */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-block-size: 38px;
+  padding: 6px 20px 6px 10px;
+}
+
+.brand-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 22px;
+  margin-inline-end: 2px;
+  opacity: 0.85;
+}
+
+.brand-mark svg {
+  display: block;
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 10px 4px 6px;
+  border: 0;
+  border-radius: var(--radius-capsule);
+  background: transparent;
+  color: var(--color-text);
+  font-size: var(--text-body);
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color var(--motion-fast) var(--ease-out),
+    color var(--motion-fast) var(--ease-out);
+}
+
+.back:hover {
+  background: var(--color-fill);
+}
+
+.back .arrow {
+  display: inline-flex;
+  color: var(--color-muted);
+}
+
+.toolbar-end {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-inline-start: auto;
+}
+
+.scroller {
+  padding: 14px 24px 40px;
+}
+
+.column {
+  display: grid;
+  gap: 16px;
+  max-inline-size: 980px;
+  margin-inline: auto;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  min-block-size: 28px;
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.stepper .period {
+  min-inline-size: 64px;
+  color: var(--color-text);
+  font-size: var(--text-body);
+  font-weight: 500;
+  text-align: center;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 315px;
+  align-items: start;
+  gap: 16px;
+}
+
+.main,
+.side {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+/* One column: the chart, then the sites, then focus and its shut list. The
+   chart keeps its axis room, which is what the tick labels are aligned to. */
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .scroller {
+    padding: 10px 12px 32px;
+  }
+
+  .toolbar {
+    padding-inline: 4px;
+  }
+
+  .overview {
+    padding: 16px;
+  }
+
+  /* Six hours is enough to read a day at this width. */
+  .bars.axis {
+    --axis-room: 40px;
+  }
+
+  .plot .rule .value {
+    font-size: 10px;
+  }
+
+  .ticks span {
+    font-size: 10px;
+  }
+
+  .side .stats {
+    padding: 14px 16px;
+  }
+
+  .focus .dial svg {
+    inline-size: 120px;
+    block-size: 120px;
+  }
+}
+
+.side {
+  align-content: start;
+}
+
+/* ------------------------------------------------------------------- cards */
+
+.overview {
+  display: grid;
+  gap: 22px;
+  padding: 20px 24px 18px;
+}
+
+.site-head {
+  display: grid;
+  gap: 8px;
+  margin-block-end: 4px;
+}
+
+.crumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  justify-self: start;
+  padding: 2px 6px 2px 2px;
+  border: 0;
+  border-radius: var(--radius-capsule);
+  background: none;
+  color: var(--color-muted);
+  font-size: var(--text-label);
+  cursor: pointer;
+}
+
+.crumb:hover {
+  color: var(--color-text);
+}
+
+.site-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.site-title h2 {
+  margin: 0;
+  overflow: hidden;
+  font-size: var(--text-title);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The figure owns the card: one big number, and the rest whispering beside it. */
+.figures {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px 20px;
+}
+
+.figure {
+  display: grid;
+  gap: 2px;
+}
+
+.total {
+  margin: 0;
+  font-size: 34px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+.aside-figure {
+  display: grid;
+  justify-items: end;
+  gap: 4px;
+  padding-block-end: 2px;
+  text-align: end;
+}
+
+.sub {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: var(--text-body);
+}
+
+.change {
+  margin: 0;
+  color: var(--color-faint);
+  font-size: var(--text-label);
+  font-variant-numeric: tabular-nums;
+}
+
+.change.up {
+  color: var(--color-accent);
+}
+
+/* The chart sits in its own band, inset from the figure. */
+.chart {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+/* The sites card: a titled card, not a bare list. */
+.sites.card {
+  padding: 14px 8px 10px;
+}
+
+.card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 16px 8px;
+}
+
+.card-head h2 {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: var(--text-caption);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.card-head .caption {
+  min-block-size: 1em;
+}
+
+.site-actions {
+  display: flex;
+  gap: 6px;
+  margin-block-start: 6px;
+}
+
+/* ------------------------------------------------------------------- chart */
+
+/* ------------------------------------------------------------------ chart */
+
+/* The chart is one SVG: the plot is a fixed coordinate space that stretches to
+   the card, while the hairlines keep their weight and the hours keep their size.
+   The axis values sit outside the plot, at the card's right edge. */
+
+.chart {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 44px;
+  align-items: end;
+  gap: 0 12px;
+}
+
+.bars {
+  display: grid;
+  grid-column: 1;
+  min-inline-size: 0;
+  margin: 0;
+}
+
+.plot {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+  overflow: visible;
+  outline: none;
+  touch-action: pan-y;
+}
+
+.plot:focus-visible {
+  border-radius: var(--radius-control-compact);
+  box-shadow: 0 0 0 2px var(--color-ring);
+}
+
+.plot .rule {
+  stroke: var(--color-rule);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.plot .average {
+  stroke: color-mix(in srgb, var(--color-text) 26%, transparent);
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+  vector-effect: non-scaling-stroke;
+}
+
+/* The baseline is dashed and sits under the columns, never over them. */
+.plot .columns {
+  border-block-end: 1px dashed var(--color-baseline);
+}
+
+.plot .bar {
+  fill: var(--color-bar);
+  transition: fill var(--motion-fast) var(--ease-out);
+}
+
+.plot .column.live .bar {
+  fill: var(--color-bar-live);
+}
+
+.plot .bar.dimmed {
+  fill: color-mix(in srgb, var(--color-bar) 45%, transparent);
+}
+
+.plot .column.active .bar {
+  fill: var(--color-bar-hot);
+}
+
+.plot .part {
+  fill: var(--color-bar-hot);
+  transition: fill var(--motion-fast) var(--ease-out);
+}
+
+.plot .column.active .part {
+  fill: var(--color-accent);
+}
+
+.plot .hit {
+  fill: transparent;
+  cursor: default;
+}
+
+.plot .hour {
+  fill: var(--color-muted);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.plot .hour.current {
+  fill: var(--color-text);
+  font-weight: 600;
+}
+
+/* The axis values: an HTML column beside the SVG, one label per rule, each
+   aligned to the rule it belongs to by the script. */
+.axis-values {
+  position: relative;
+  grid-column: 2;
+  block-size: 100%;
+  color: var(--color-muted);
+  font-size: var(--text-label);
+  font-variant-numeric: tabular-nums;
+}
+
+.axis-values span {
+  position: absolute;
+  inset-inline-end: 0;
+  translate: 0 -50%;
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------------- sites */
+
+.local {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 0;
+  padding: 4px 0 0;
+  color: var(--color-muted);
+  font-size: var(--text-label);
+}

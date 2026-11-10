@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FoFlow — preview</title>
+    <link rel="icon" href="../assets/icons/32.png" />
+    <link rel="stylesheet" href="../src/styles/tokens.css" />
+    <link rel="stylesheet" href="../src/styles/ui.css" />
+    <link rel="stylesheet" href="../src/pages/time/time.css" />
+    <script src="../src/ui/theme-boot.js"></script>
+    <style>
+      .demo-note {
+        position: fixed;
+        inset-block-end: 12px;
+        inset-inline-end: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 6px 6px 12px;
+        border-radius: var(--radius-capsule);
+        background: var(--color-card);
+        box-shadow: var(--shadow-float);
+        color: var(--color-muted);
+        font-size: var(--text-caption);
+        z-index: 20;
+      }
+
+      .demo-mark {
+        border-radius: 4px;
+      }
+
+      .demo-note .link {
+        padding: 3px 9px;
+        border: 0;
+        border-radius: var(--radius-capsule);
+        background: var(--color-fill);
+        color: var(--color-text);
+        font: inherit;
+        font-weight: 500;
+        cursor: pointer;
+      }
+
+      .demo-note .link:hover {
+        background: var(--color-fill-hover);
+      }
+    </style>
+  </head>
+  <body>
+    <!--
+      A preview of the Time page with sample figures, built from the same
+      modules and styles the extension ships. It carries the page's markup
+      itself rather than fetching it, so it renders from any static server.
+
+        node extensions/foflow/scripts/serve.mjs
+    -->
+    <header class="toolbar">
+      <span class="brand-mark" id="brand" aria-hidden="true"></span>
+      <button type="button" class="back" id="back">
+        <span class="arrow" aria-hidden="true"></span>
+        <span class="back-label" id="toolbar-title">Time</span>
+      </button>
+      <div class="toolbar-end" id="toolbar-end"></div>
+    </header>
+
+    <main class="scroller">
+      <div class="column">
+        <div class="controls">
+          <div class="segmented" id="span" role="group" aria-label="Period">
+            <button type="button" data-span="day" aria-pressed="true">Day</button>
+            <button type="button" data-span="week" aria-pressed="false">Week</button>
+          </div>
+          <div class="stepper">
+            <button type="button" class="icon-button" id="previous" aria-label="Previous day"></button>
+            <span class="period" id="period-label">Today</span>
+            <button type="button" class="icon-button" id="next" aria-label="Next day"></button>
+          </div>
+          <button type="button" class="button ghost" id="today" hidden>Back to today</button>
+        </div>
+
+        <div class="layout">
+          <div class="main">
+            <section class="card page overview">
+              <div class="site-head" id="site-head" hidden>
+                <button type="button" class="crumb" id="crumb"></button>
+                <div class="site-title">
+                  <span id="site-mark"></span>
+                  <h2 id="site-name"></h2>
+                </div>
+              </div>
+              <div class="figures">
+                <p class="total" id="total">0m</p>
+                <div class="aside-figure">
+                  <p class="sub" id="sub">on the web</p>
+                  <p class="change" id="change"></p>
+                </div>
+              </div>
+              <div class="chart" id="chart"></div>
+              <div class="site-actions" id="site-actions" hidden></div>
+            </section>
+
+            <section class="card sites" id="sites-card">
+              <header class="card-head">
+                <h2>Sites</h2>
+                <p class="caption" id="sites-caption"></p>
+              </header>
+              <div id="sites"></div>
+            </section>
+          </div>
+
+          <aside class="side">
+            <div id="focus"></div>
+            <section class="card stats" id="stats" aria-label="Focus" hidden>
+              <div>
+                <span class="stat" id="stat-focused">0m</span>
+                <span class="label">Focused</span>
+              </div>
+              <div>
+                <span class="stat" id="stat-sessions">0</span>
+                <span class="label">Sessions</span>
+              </div>
+              <div>
+                <span class="stat" id="stat-completed">0</span>
+                <span class="label">Completed</span>
+              </div>
+            </section>
+            <section class="card shut" id="shut-card">
+              <h3>Shut during focus</h3>
+              <p class="help">
+                These sites stay closed while a focus round runs. Breaks open them again.
+              </p>
+              <div id="shut-editor"></div>
+            </section>
+            <p class="local" id="local"></p>
+          </aside>
+        </div>
+      </div>
+    </main>
+
+    <p class="demo-note"><img class="demo-mark" src="../assets/icons/32.png" alt="" width="16" height="16" />Preview with sample data · <button type="button" class="link" id="cycle-theme">Change theme</button></p>
+    <script type="module" src="demo.js"></script>
+  </body>
+</html>

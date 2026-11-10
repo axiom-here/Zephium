@@ -1,0 +1,93 @@
+/* The toolbar popup: the sidebar's Time panel at 340px. Everything component-
+   shaped comes from ui.css; this file sets the width and the stacking. */
+
+body {
+  inline-size: 340px;
+  max-block-size: 600px;
+  overflow-y: auto;
+  background: var(--color-chrome);
+}
+
+.popup {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-3);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 2px 2px;
+}
+
+.head .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--color-text);
+  font-size: var(--text-page-title);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.head .brand .mark {
+  color: var(--color-accent);
+}
+
+.head-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-inline-start: auto;
+}
+
+.sites-card {
+  display: grid;
+  gap: 2px;
+  padding: var(--space-2) var(--space-2) var(--space-1);
+  border-radius: var(--radius-card);
+  background: var(--color-card);
+  box-shadow: var(--row-rim);
+}
+
+.section-title {
+  margin: 0 var(--space-2) var(--space-1);
+  color: var(--color-faint);
+  font-size: var(--text-caption);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.local {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  margin: 0;
+  color: var(--color-faint);
+  font-size: var(--text-caption);
+}
+
+/* Today, in the popup: two figures side by side rather than the page's three,
+   in the same card skin. The component itself is in ui.css. */
+.stats.two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--color-card);
+  box-shadow: var(--row-rim);
+}
+
+.stats .divider {
+  inline-size: 1px;
+  block-size: 26px;
+  background: var(--color-border);
+}
+
+/* The list is a component; the popup only frames it. */
+.sites-card .sites {
+  padding-block-end: var(--space-1);
+}

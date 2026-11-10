@@ -1,0 +1,152 @@
+/* Settings as the browser sets them: a 640px column, grouped rows, and the
+   same toolbar as the Time page so there is always a way back. */
+body {
+  background: var(--color-page);
+}
+
+.toolbar {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 10px clamp(16px, 4vw, 48px);
+  background: color-mix(in srgb, var(--color-page) 88%, transparent);
+  backdrop-filter: blur(18px);
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 10px 4px 5px;
+  border: 0;
+  border-radius: var(--radius-capsule);
+  background: transparent;
+  color: var(--color-muted);
+  font-size: var(--text-body);
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color var(--motion-fast) var(--ease-out),
+    color var(--motion-fast) var(--ease-out);
+}
+
+.back:hover {
+  background: var(--color-fill);
+  color: var(--color-text);
+}
+
+.back .arrow {
+  display: inline-flex;
+}
+
+.toolbar-end {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-inline-start: auto;
+}
+
+.column {
+  display: grid;
+  gap: var(--space-5);
+  max-inline-size: 640px;
+  margin-inline: auto;
+  padding: var(--space-4) var(--space-5) var(--space-9);
+}
+
+.head h1 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-size: var(--text-title);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.head p {
+  margin: 6px 0 0;
+  color: var(--color-muted);
+  font-size: var(--text-body);
+}
+
+#groups {
+  display: grid;
+  gap: 18px;
+}
+
+.group {
+  display: grid;
+  gap: 2px;
+  padding: var(--space-2);
+  border-radius: var(--radius-card);
+  background: var(--color-card);
+  box-shadow: var(--row-rim);
+}
+
+.group h2 {
+  margin: var(--space-2) var(--space-3) var(--space-1);
+  color: var(--color-faint);
+  font-size: var(--text-caption);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-block-size: var(--row-height);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-row);
+}
+
+.row:hover {
+  background: var(--row-hover);
+}
+
+.row .text {
+  display: grid;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.row .label {
+  font-size: var(--text-body);
+}
+
+.row .help {
+  color: var(--color-muted);
+  font-size: var(--text-label);
+  line-height: 1.45;
+}
+
+.minutes {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.minutes .unit {
+  color: var(--color-muted);
+  font-size: var(--text-label);
+}
+
+.local {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  margin: 0;
+  color: var(--color-faint);
+  font-size: var(--text-caption);
+}
+
+#lock {
+  display: inline-flex;
+}

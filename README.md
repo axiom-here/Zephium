@@ -251,6 +251,11 @@ touch the data of an installed Zephium. Linux is not supported yet. See
 Read more in [docs/architecture.md](docs/architecture.md) and
 [docs/security-model.md](docs/security-model.md).
 
+The browser's [Focus](README.md#built-in) and Time surfaces also ship as a
+standalone Chromium extension for other browsers, in
+[extensions/foflow](extensions/foflow/README.md); it is a port of
+the same domain code, not part of the browser's build.
+
 ## Contributing
 
 Zephium is maintained by one person with a clear product direction, so please

@@ -14,6 +14,9 @@ while IFS= read -r path; do
   [[ -z "${path}" ]] && continue
   case "${path}" in
     docs/* | *.md | .coderabbit.yaml | .github/ISSUE_TEMPLATE/* | CODEOWNERS | LICENSE*) ;;
+    # Standalone Chromium extensions: nothing in the browser compiles or reads
+    # them, so they build and publish on their own.
+    extensions/*) ;;
     frame/*)
       frontend=true
       if grep -rqF --include='*.rs' "${path}" crates desktop xtask; then

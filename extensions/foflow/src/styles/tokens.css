@@ -1,0 +1,300 @@
+/* Semantic tokens: the only names components may use. Dark is the base; light
+   and Catppuccin Mocha are complete mirrors of it, so every surface is built
+   from the same names and a theme changes nothing but the values.
+
+   The theme is an attribute on <html>, set before first paint by the inline
+   script in each page's head: unset means "follow the system", which is why
+   the light block is guarded against the two explicit dark choices. */
+
+:root {
+  color-scheme: dark;
+
+
+  --color-canvas: #0d1117;
+  --color-page: #0d1117;
+  --color-chrome: #0d1117;
+  --color-surface: #181c22;
+  --color-raised: #23262c;
+  --color-float: #23262c;
+  --color-card: #181c22;
+
+  --color-fill: rgb(255 255 255 / 0.06);
+  --color-fill-hover: rgb(255 255 255 / 0.1);
+  --color-fill-pressed: rgb(255 255 255 / 0.16);
+  --color-tile: rgb(255 255 255 / 0.06);
+  --color-tile-hover: rgb(255 255 255 / 0.1);
+
+  --color-border: rgb(255 255 255 / 0.06);
+  --color-border-strong: rgb(255 255 255 / 0.12);
+  --color-rule: rgb(255 255 255 / 0.07);
+  --color-baseline: rgb(255 255 255 / 0.11);
+  --row-hover: rgb(255 255 255 / 0.04);
+  --row-active: rgb(255 255 255 / 0.07);
+  --row-rim: none;
+
+  --color-bar: #4e5358;
+  --color-bar-live: #6b7076;
+  --color-bar-hot: #8b9096;
+
+  --color-text: #e6edf3;
+  --color-label-secondary: #c9d1d9;
+  --color-muted: #8b949e;
+  --color-faint: #8b949e;
+
+  --color-field: #2b2f35;
+  --color-field-hover: #33373d;
+  --color-field-ring: rgb(255 255 255 / 0.18);
+  --shadow-field: none;
+  --shadow-field-focus: inset 0 0 0 1px var(--color-field-ring);
+
+  --color-control: #272c31;
+  --color-control-hover: #30353b;
+  --color-control-pressed: #3a3f45;
+  --color-primary: #dee5eb;
+  --color-primary-hover: #eef3f7;
+  --color-on-primary: #0d1117;
+  --color-on-control: var(--color-text);
+
+  --color-track: rgb(255 255 255 / 0.1);
+  --color-ring: rgb(255 255 255 / 0.5);
+  --color-danger: #f0a3a3;
+  --color-danger-wash: rgb(240 163 163 / 0.14);
+  --color-accent: #88d0b3;
+  --color-accent-ink: #0d1117;
+  --color-accent-wash: rgb(136 208 179 / 0.16);
+
+  --shadow-float: 0 16px 40px rgb(0 0 0 / 0.5), 0 2px 8px rgb(0 0 0 / 0.34);
+  --color-menu: #23262c;
+  --color-menu-separator: rgb(255 255 255 / 0.09);
+
+  --radius-capsule: 999px;
+  --radius-control: 14px;
+  --radius-control-compact: 10px;
+  --radius-card: 18px;
+  --radius-row: 12px;
+  --radius-field: 10px;
+
+  --text-caption: 11px;
+  --text-label: 12px;
+  --text-body: 13px;
+  --text-page-title: 15px;
+  --text-title: 22px;
+  --text-display: 34px;
+  --text-display-lg: 44px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
+  --space-9: 56px;
+
+  --field-height: 30px;
+  --row-height: 46px;
+  --control-inset: 10px;
+
+  --motion-fast: 120ms;
+  --motion-slow: 300ms;
+  --motion-page: 400ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-emphasized: cubic-bezier(0.2, 0.9, 0.2, 1);
+
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI Variable Text", "Segoe UI", "Noto Sans",
+    "Cantarell", sans-serif;
+}
+
+/* Light, but only when the reader has not asked for an explicit dark theme. */
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"], [data-theme="mocha"]) {
+    color-scheme: light;
+
+    --color-canvas: #f6f7f9;
+    --color-page: #f6f7f9;
+    --color-chrome: #ffffff;
+    --color-surface: #ffffff;
+    --color-raised: #ffffff;
+    --color-float: #ffffff;
+    --color-card: #ffffff;
+
+    --color-fill: rgb(13 17 23 / 0.05);
+    --color-fill-hover: rgb(13 17 23 / 0.08);
+    --color-fill-pressed: rgb(13 17 23 / 0.12);
+    --color-tile: rgb(13 17 23 / 0.05);
+    --color-tile-hover: rgb(13 17 23 / 0.08);
+
+    --color-border: rgb(13 17 23 / 0.08);
+    --color-border-strong: rgb(13 17 23 / 0.14);
+    --color-rule: rgb(13 17 23 / 0.08);
+    --color-baseline: rgb(13 17 23 / 0.16);
+    --row-hover: rgb(13 17 23 / 0.04);
+    --row-active: rgb(13 17 23 / 0.07);
+    --row-rim: none;
+
+    --color-bar: #b6bcc4;
+    --color-bar-live: #8b939c;
+    --color-bar-hot: #5b636d;
+
+    --color-text: #1b2027;
+    --color-label-secondary: #3e4650;
+    --color-muted: #5c646e;
+    --color-faint: #5c646e;
+
+    --color-field: #eef0f2;
+    --color-field-hover: #e6e9ec;
+    --color-field-ring: rgb(13 17 23 / 0.18);
+    --shadow-field: none;
+    --shadow-field-focus: inset 0 0 0 1px var(--color-field-ring);
+
+    --color-control: #eceef0;
+    --color-control-hover: #e3e6e9;
+    --color-control-pressed: #dadee2;
+    --color-primary: #1b2027;
+    --color-primary-hover: #0d1117;
+    --color-on-primary: #f6f7f9;
+    --color-on-control: var(--color-text);
+
+    --color-track: rgb(13 17 23 / 0.12);
+    --color-ring: rgb(13 17 23 / 0.45);
+    --color-danger: #b4392f;
+    --color-danger-wash: rgb(180 57 47 / 0.12);
+    --color-accent: #2f7d5c;
+    --color-accent-ink: #f6f7f9;
+    --color-accent-wash: rgb(47 125 92 / 0.14);
+
+    --shadow-float: 0 16px 36px rgb(13 17 23 / 0.16), 0 2px 8px rgb(13 17 23 / 0.08);
+    --color-menu: #ffffff;
+    --color-menu-separator: rgb(13 17 23 / 0.09);
+  }
+}
+
+/* Explicit light: the same block, chosen rather than inherited. */
+:root[data-theme="light"] {
+  color-scheme: light;
+
+
+  --color-canvas: #f6f7f9;
+  --color-page: #f6f7f9;
+  --color-chrome: #ffffff;
+  --color-surface: #ffffff;
+  --color-raised: #ffffff;
+  --color-float: #ffffff;
+  --color-card: #ffffff;
+
+  --color-fill: rgb(13 17 23 / 0.05);
+  --color-fill-hover: rgb(13 17 23 / 0.08);
+  --color-fill-pressed: rgb(13 17 23 / 0.12);
+  --color-tile: rgb(13 17 23 / 0.05);
+  --color-tile-hover: rgb(13 17 23 / 0.08);
+
+  --color-border: rgb(13 17 23 / 0.08);
+  --color-border-strong: rgb(13 17 23 / 0.14);
+  --color-rule: rgb(13 17 23 / 0.08);
+  --color-baseline: rgb(13 17 23 / 0.16);
+  --row-hover: rgb(13 17 23 / 0.04);
+  --row-active: rgb(13 17 23 / 0.07);
+  --row-rim: none;
+
+  --color-bar: #b6bcc4;
+  --color-bar-live: #8b939c;
+  --color-bar-hot: #5b636d;
+
+  --color-text: #1b2027;
+  --color-label-secondary: #3e4650;
+  --color-muted: #5c646e;
+  --color-faint: #5c646e;
+
+  --color-field: #eef0f2;
+  --color-field-hover: #e6e9ec;
+  --color-field-ring: rgb(13 17 23 / 0.18);
+  --shadow-field: none;
+  --shadow-field-focus: inset 0 0 0 1px var(--color-field-ring);
+
+  --color-control: #eceef0;
+  --color-control-hover: #e3e6e9;
+  --color-control-pressed: #dadee2;
+  --color-primary: #1b2027;
+  --color-primary-hover: #0d1117;
+  --color-on-primary: #f6f7f9;
+  --color-on-control: var(--color-text);
+
+  --color-track: rgb(13 17 23 / 0.12);
+  --color-ring: rgb(13 17 23 / 0.45);
+  --color-danger: #b4392f;
+  --color-danger-wash: rgb(180 57 47 / 0.12);
+  --color-accent: #2f7d5c;
+  --color-accent-ink: #f6f7f9;
+  --color-accent-wash: rgb(47 125 92 / 0.14);
+
+  --shadow-float: 0 16px 36px rgb(13 17 23 / 0.16), 0 2px 8px rgb(13 17 23 / 0.08);
+  --color-menu: #ffffff;
+  --color-menu-separator: rgb(13 17 23 / 0.09);
+}
+
+/* Catppuccin Mocha, the official palette: a dark theme with a violet accent
+   rather than the base theme's neutral ladder. */
+:root[data-theme="mocha"] {
+  color-scheme: dark;
+
+
+  --color-canvas: #11111b;
+  --color-page: #1e1e2e;
+  --color-chrome: #181825;
+  --color-surface: #313244;
+  --color-raised: #45475a;
+  --color-float: #45475a;
+  --color-card: #313244;
+
+  --color-fill: rgb(205 214 244 / 0.06);
+  --color-fill-hover: rgb(205 214 244 / 0.1);
+  --color-fill-pressed: rgb(205 214 244 / 0.16);
+  --color-tile: rgb(205 214 244 / 0.07);
+  --color-tile-hover: rgb(205 214 244 / 0.12);
+
+  --color-border: rgb(205 214 244 / 0.09);
+  --color-border-strong: rgb(205 214 244 / 0.16);
+  --color-rule: rgb(205 214 244 / 0.09);
+  --color-baseline: rgb(205 214 244 / 0.18);
+  --row-hover: rgb(205 214 244 / 0.05);
+  --row-active: rgb(205 214 244 / 0.1);
+  --row-rim: none;
+
+  --color-bar: #585b70;
+  --color-bar-live: #7f849c;
+  --color-bar-hot: #a6adc8;
+
+  --color-text: #cdd6f4;
+  --color-label-secondary: #bac2de;
+  --color-muted: #a6adc8;
+  --color-faint: #959cb4;
+
+  --color-field: rgb(205 214 244 / 0.1);
+  --color-field-hover: rgb(205 214 244 / 0.14);
+  --color-field-ring: #b4befe;
+  --shadow-field: none;
+  --shadow-field-focus: inset 0 0 0 1px var(--color-field-ring);
+
+  --color-control: rgb(205 214 244 / 0.1);
+  --color-control-hover: rgb(205 214 244 / 0.16);
+  --color-control-pressed: rgb(205 214 244 / 0.2);
+  --color-primary: #b4befe;
+  --color-primary-hover: #c7d0ff;
+  --color-on-primary: #11111b;
+  --color-on-control: var(--color-text);
+
+  --color-track: #45475a;
+  --color-ring: #b4befe;
+  --color-danger: #f38ba8;
+  --color-danger-wash: rgb(243 139 168 / 0.16);
+  --color-accent: #cba6f7;
+  --color-accent-ink: #11111b;
+  --color-accent-wash: rgb(203 166 247 / 0.16);
+
+  --shadow-float: 0 18px 44px rgb(17 17 27 / 0.6), 0 2px 10px rgb(17 17 27 / 0.4);
+  --color-menu: #313244;
+  --color-menu-separator: rgb(205 214 244 / 0.12);
+}
