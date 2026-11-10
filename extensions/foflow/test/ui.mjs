@@ -273,7 +273,7 @@ test("a first run reads as empty, not as broken", { skip }, async () => {
   assert.equal(document.querySelector("#total").textContent.trim(), "0m");
   // The chart is still a full day, not a blank box.
   assert.equal(document.querySelectorAll(".plot .column").length, 24);
-  assert.equal(document.querySelectorAll(".plot .ticks span").length, 8);
+  assert.equal(document.querySelectorAll(".plot .hour").length, 8);
   assert.equal(document.querySelectorAll(".plot .bar").length, 0, "an empty day draws no bars");
   // An empty list shows its empty state and no column header over it.
   assert.match(text(document.querySelector("#sites")), /Nothing counted yet/u);

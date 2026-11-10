@@ -296,172 +296,114 @@ body {
 
 /* ------------------------------------------------------------------ chart */
 
-/* The chart sits inside the figure's card, above its own dashed baseline. The
-   plot is 240px tall with 24px of room under it for the hours, and 44px at its
-   right edge for the axis values. */
+/* The chart is one SVG: the plot is a fixed coordinate space that stretches to
+   the card, while the hairlines keep their weight and the hours keep their size.
+   The axis values sit outside the plot, at the card's right edge. */
+
 .chart {
   display: grid;
+  grid-template-columns: minmax(0, 1fr) 44px;
+  align-items: end;
+  gap: 0 12px;
 }
 
 .bars {
-  margin: 0;
+  display: grid;
+  grid-column: 1;
   min-inline-size: 0;
-}
-
-.bars.axis {
-  --axis-room: 44px;
-  --plot-gap: 24px;
+  margin: 0;
 }
 
 .plot {
-  position: relative;
-  block-size: var(--plot-height, 240px);
-  margin-block-end: var(--plot-gap);
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+  overflow: visible;
   outline: none;
   touch-action: pan-y;
 }
 
 .plot:focus-visible {
+  border-radius: var(--radius-control-compact);
   box-shadow: 0 0 0 2px var(--color-ring);
 }
 
-/* The rules are hairlines above the card, and their values sit to the right of
-   the plot rather than inside it. */
 .plot .rule {
-  position: absolute;
-  inset-inline: 0 var(--axis-room);
-  block-size: 0;
-  border-block-start: 1px solid var(--color-rule);
-  pointer-events: none;
-}
-
-.plot .rule .value {
-  position: absolute;
-  inset-inline-start: calc(100% + 12px);
-  inset-block-start: -7px;
-  color: var(--color-muted);
-  font-size: var(--text-label);
-  font-variant-numeric: tabular-nums;
-  line-height: 14px;
-  white-space: nowrap;
+  stroke: var(--color-rule);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
 }
 
 .plot .average {
-  position: absolute;
-  inset-inline: 0 var(--axis-room);
-  block-size: 0;
-  border-block-start: 1px dashed color-mix(in srgb, var(--color-text) 24%, transparent);
-  pointer-events: none;
-  z-index: 1;
+  stroke: color-mix(in srgb, var(--color-text) 26%, transparent);
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+  vector-effect: non-scaling-stroke;
 }
 
-/* The baseline: a dashed rule the columns stand on, never a solid bar. */
+/* The baseline is dashed and sits under the columns, never over them. */
 .plot .columns {
-  position: absolute;
-  inset: 0 var(--axis-room) 0 0;
-  display: flex;
-  align-items: stretch;
-  gap: 4px;
   border-block-end: 1px dashed var(--color-baseline);
 }
 
-.plot .column {
-  position: relative;
-  flex: 1;
-  min-width: 0;
-}
-
-.plot .track {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-}
-
 .plot .bar {
-  position: absolute;
-  inset: 0;
-  border-start-start-radius: 2px;
-  border-start-end-radius: 2px;
-  background: var(--color-bar);
-  transition:
-    transform var(--motion-page) var(--ease-emphasized),
-    background-color var(--motion-fast) var(--ease-out);
-  animation: rise var(--motion-page) var(--ease-emphasized) var(--rise, 0ms) backwards;
-}
-
-.plot .bar.part {
-  background: var(--color-bar-hot);
+  fill: var(--color-bar);
+  transition: fill var(--motion-fast) var(--ease-out);
 }
 
 .plot .column.live .bar {
-  background: var(--color-bar-live);
+  fill: var(--color-bar-live);
 }
 
-.plot .column.dimmed .bar:not(.part) {
-  background: color-mix(in srgb, var(--color-bar) 45%, transparent);
+.plot .bar.dimmed {
+  fill: color-mix(in srgb, var(--color-bar) 45%, transparent);
 }
 
 .plot .column.active .bar {
-  background: var(--color-bar-hot);
+  fill: var(--color-bar-hot);
 }
 
-@keyframes rise {
-  from {
-    transform: translateY(100%);
-  }
+.plot .part {
+  fill: var(--color-bar-hot);
+  transition: fill var(--motion-fast) var(--ease-out);
 }
 
-.plot .readout {
-  position: absolute;
-  inset-block-end: calc(100% + 8px);
-  display: grid;
-  gap: 1px;
-  padding: 6px 9px;
-  border-radius: var(--radius-control-compact);
-  background: var(--color-menu);
-  box-shadow: var(--row-rim), var(--shadow-float);
-  translate: -50% 0;
-  pointer-events: none;
-  white-space: nowrap;
-  z-index: 3;
+.plot .column.active .part {
+  fill: var(--color-accent);
 }
 
-.plot .readout .when {
-  color: var(--color-muted);
-  font-size: var(--text-caption);
+.plot .hit {
+  fill: transparent;
+  cursor: default;
 }
 
-.plot .readout .amount {
-  font-size: var(--text-label);
+.plot .hour {
+  fill: var(--color-muted);
+  font-size: 11px;
   font-variant-numeric: tabular-nums;
 }
 
-/* The hours, under the baseline, aligned to the plot rather than to the card. */
-.ticks {
-  position: absolute;
-  inset-block-start: calc(100% + 4px);
-  inset-inline-end: var(--axis-room);
-  inset-inline-start: 0;
-  block-size: 20px;
-}
-
-.ticks span {
-  position: absolute;
-  inset-block-start: 0;
-  color: var(--color-muted);
-  font-size: var(--text-label);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-  translate: -50% 0;
-}
-
-.ticks span.first {
-  translate: 0 0;
-}
-
-.ticks span.current {
-  color: var(--color-text);
+.plot .hour.current {
+  fill: var(--color-text);
   font-weight: 600;
+}
+
+/* The axis values: an HTML column beside the SVG, one label per rule, each
+   aligned to the rule it belongs to by the script. */
+.axis-values {
+  position: relative;
+  grid-column: 2;
+  block-size: 100%;
+  color: var(--color-muted);
+  font-size: var(--text-label);
+  font-variant-numeric: tabular-nums;
+}
+
+.axis-values span {
+  position: absolute;
+  inset-inline-end: 0;
+  translate: 0 -50%;
+  white-space: nowrap;
 }
 
 /* ------------------------------------------------------------------- sites */

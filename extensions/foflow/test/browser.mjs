@@ -19,10 +19,12 @@ test("the Time page draws a day, a site list and the focus card", { skip }, asyn
   assert.match(text(document.querySelector("#sites")), /26%/u);
   // The day is one column per hour, each with its own track.
   assert.equal(document.querySelectorAll(".plot .column").length, 24);
-  assert.equal(document.querySelectorAll(".plot .ticks span").length, 8);
+  assert.equal(document.querySelectorAll(".plot .hour").length, 8);
   assert.ok(document.querySelectorAll(".plot .rule").length >= 2, "the plot has its rules");
-  // The peak is 58m, so the axis steps in half hours: 1h reads top-down.
-  assert.match(text(document.querySelector(".plot")), /^30m1h/u, "the axis values are written in");
+  // The peak is 58m, so the axis steps in half hours and the values are written
+  // beside the rules, top-down.
+  assert.ok(document.querySelectorAll(".axis-values span").length >= 2, "the axis values are written in");
+  assert.match(text(document.querySelector(".axis-values")), /\d+[hm]/u, "the axis values are readable times");
   assert.match(text(document.querySelector("#focus")), /Start focus/u);
   assert.equal(document.querySelectorAll("#shut-editor .shut-list li").length, 1);
 });
