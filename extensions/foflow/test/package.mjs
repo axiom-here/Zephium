@@ -167,3 +167,57 @@ test("no string is written twice, and none is left unused", () => {
   const unused = keys.filter((key) => !used.has(key) && !built.includes(key));
   assert.deepEqual(unused, [], "a string is written but never shown");
 });
+
+test("label inks clear AA contrast in every theme", () => {
+  // The axis hours, the column headings and the captions are body text: a
+  // palette tweak must not quietly make them unreadable.
+  const css = readFileSync(join(ROOT, "src/styles/tokens.css"), "utf8");
+  const themeAt = (marker) => {
+    const start = css.indexOf(marker);
+    const block = css.slice(start, css.indexOf("\n}", start));
+    const value = (name) => /:\s*([^;]+);/u.exec(block.slice(block.indexOf(`${name}:`)))[1].trim();
+    return {
+      page: value("--color-page"),
+      text: value("--color-text"),
+      muted: value("--color-muted"),
+      faint: value("--color-faint"),
+      accent: value("--color-accent"),
+    };
+  };
+  const rgb = (color) => {
+    const hex = /^#([0-9a-f]{6})$/iu.exec(color);
+    if (hex) return [0, 2, 4].map((at) => parseInt(hex[1].slice(at, at + 2), 16));
+    const parts = /rgb\(\s*([\d.]+)\s+([\d.]+)\s+([\d.]+)\s*\/\s*([\d.]+)\s*\)/u.exec(color);
+    if (parts) return { alpha: Number(parts[4]), rgb: [1, 2, 3].map((at) => Number(parts[at])) };
+    throw new Error(`cannot read ${color}`);
+  };
+  const luminance = (c) => {
+    const [r, g, b] = c.map((v) => {
+      const s = v / 255;
+      return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+    });
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+  const ratio = (a, b) => {
+    const [light, dark] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+    return (light + 0.05) / (dark + 0.05);
+  };
+
+  for (const [name, marker] of [
+    ["dark", ":root {"],
+    ["light", ':root[data-theme="light"]'],
+    ["mocha", ':root[data-theme="mocha"]'],
+  ]) {
+    const theme = themeAt(marker);
+    // Text sits on the page, or on a card that is the page plus a light wash.
+    const page = rgb(theme.page);
+    for (const key of ["text", "muted", "faint"]) {
+      const ink = rgb(theme[key]);
+      const inkRgb = Array.isArray(ink) ? ink : ink.rgb.map((v, at) => v * ink.alpha + page[at] * (1 - ink.alpha));
+      assert.ok(
+        ratio(inkRgb, page) >= 4.5,
+        `${name}: --color-${key} is ${ratio(inkRgb, page).toFixed(2)}:1 on its own surface, below 4.5:1`,
+      );
+    }
+  }
+});
