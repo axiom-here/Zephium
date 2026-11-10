@@ -103,17 +103,55 @@ body {
   gap: 16px;
 }
 
-@media (max-width: 880px) {
+.main,
+.side {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+/* One column: the chart, then the sites, then focus and its shut list. The
+   chart keeps its axis room, which is what the tick labels are aligned to. */
+@media (max-width: 900px) {
   .layout {
     grid-template-columns: minmax(0, 1fr);
   }
 }
 
-.main,
-.side {
-  display: grid;
-  gap: var(--space-4);
-  min-width: 0;
+@media (max-width: 560px) {
+  .scroller {
+    padding: 10px 12px 32px;
+  }
+
+  .toolbar {
+    padding-inline: 4px;
+  }
+
+  .overview {
+    padding: 16px;
+  }
+
+  /* Six hours is enough to read a day at this width. */
+  .bars.axis {
+    --axis-room: 40px;
+  }
+
+  .plot .rule .value {
+    font-size: 10px;
+  }
+
+  .ticks span {
+    font-size: 10px;
+  }
+
+  .side .stats {
+    padding: 14px 16px;
+  }
+
+  .focus .dial svg {
+    inline-size: 120px;
+    block-size: 120px;
+  }
 }
 
 .side {
