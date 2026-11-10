@@ -128,7 +128,7 @@ function draw() {
       el("h2", { text: m("focus_title") }),
       row({
         label: m("focus_length"),
-        help: "How long one round lasts when you start focus.",
+        help: m("settings_back_help"),
         control: minutes(),
       }),
       row({
@@ -209,12 +209,12 @@ function draw() {
     el(
       "section",
       { class: "group" },
-      el("h2", { text: "Appearance" }),
+      el("h2", { text: m("settings_appearance") }),
       row({
-        label: "Theme",
-        help: "Light, dark, or Catppuccin Mocha.",
+        label: m("theme"),
+        help: m("settings_theme_help"),
         control: chooser({
-          label: "Theme",
+          label: m("theme"),
           value: () => themeLabel,
           items: THEMES.map((entry) => ({
             id: entry.id,

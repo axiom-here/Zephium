@@ -99,6 +99,23 @@ the port is honest about them rather than pretending otherwise:
   session storage, so a cover is still known after the service worker sleeps.
 - **Bounded.** At most 256 shut sites, 400 sites a day, 32 allowances a round,
   366 days of focus figures, and a retention setting for counted time.
+- **One component layer.** `src/styles/tokens.css` holds the palette, the type
+  scale, the radii and the motion; `src/styles/ui.css` holds every component
+  (card, button, field, switch, segmented control, menu, site mark). A page
+  stylesheet only adds layout. Nothing is styled in a page that another page
+  needs — that is exactly how the popup once shipped with no layout at all.
+- **No OS widgets.** Choices are drawn by `src/ui/menu.js`, appended to the
+  body and placed against its trigger, so a menu is the extension's own and is
+  never clipped by a card or a 340px popup. A native `<select>` would follow
+  the operating system, not the theme.
+- **Three themes.** Light, dark and Catppuccin Mocha, or follow the system.
+  The choice is owned by `chrome.storage.local` and mirrored into
+  `localStorage`, which `src/ui/theme-boot.js` — a classic script in each
+  page's head — reads before the body is parsed, so no surface ever paints the
+  wrong theme first.
+- **Every surface goes back.** The Time page's toolbar carries the theme and
+  settings; settings carries Back and the theme; the cover carries the theme;
+  the popup carries the theme and *Open the Time page*.
 
 ## Preview
 
@@ -115,14 +132,23 @@ node extensions/foflow/scripts/serve.mjs
 node extensions/foflow/test/run.mjs         # domain logic, no dependencies
 node extensions/foflow/test/package.mjs     # the package the browser loads
 npm install --no-save jsdom
-node --test-force-exit --test extensions/foflow/test/browser.mjs
+node --test-force-exit --test extensions/foflow/test/browser.mjs extensions/foflow/test/ui.mjs
 ```
 
 `test/package.mjs` is the one that catches the failure a person sees first:
 every file the manifest names, and every path the code hands to
 `chrome.runtime.getURL`, must exist — a stale path is `ERR_FILE_NOT_FOUND` in the
 browser and invisible to every other test. It also checks that every page's
-stylesheet, script and icon link resolves.
+stylesheet, script and icon link resolves, that every message a page sends has
+a handler, that every string a page asks for is written, and that every page
+reads the stored theme in its head.
+
+`test/ui.mjs` is the one that catches what a screenshot catches: the popup's
+own width and grid, a dial that is a hollow ring rather than a filled disc, a
+back control on settings, no native select anywhere, a menu that opens, is
+walked with the keyboard and closes on Escape, and the three themes applied to
+the document and remembered. A theme control and a focus card also have to
+release their storage listeners when they go.
 
 The first suite covers the phase machine, the gate, allowances, site matching,
 the ledger, the flush and the report — the places where a port drifts, including

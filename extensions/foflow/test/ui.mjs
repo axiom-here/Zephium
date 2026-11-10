@@ -90,6 +90,29 @@ test("the length menu is the extension's own, placed above the page", { skip }, 
   assert.equal(document.querySelector("body > .menu"), null, "escape closes it");
 });
 
+test("a menu can be walked from the keyboard, and escape leaves it", { skip }, async () => {
+  const { document, window } = await open("src/pages/options/options.html");
+  const chooser = document.querySelectorAll(".select-trigger")[1];
+  chooser.click();
+  await settle();
+  const focused = () => document.activeElement.textContent.replace(/\s+/gu, " ").trim();
+  const press = (key) => {
+    const event = new window.KeyboardEvent("keydown", { key, bubbles: true, cancelable: true });
+    document.activeElement.dispatchEvent(event);
+    return event.defaultPrevented;
+  };
+  assert.equal(focused(), "Follow the system", "the current value takes focus");
+  assert.equal(press("ArrowDown"), true);
+  assert.equal(focused(), "Light");
+  press("End");
+  assert.equal(focused(), "Catppuccin Mocha");
+  press("ArrowDown");
+  assert.equal(focused(), "Follow the system", "the last item wraps to the first");
+  assert.equal(press("Escape"), true);
+  assert.equal(document.querySelector("body > .menu"), null);
+  assert.equal(document.activeElement, chooser, "focus returns to the trigger");
+});
+
 test("no native select is left anywhere", { skip }, async () => {
   const { document } = await open("src/pages/options/options.html");
   assert.equal(document.querySelectorAll("select").length, 0);

@@ -101,3 +101,52 @@ test("the name is FoFlow everywhere a person sees it", () => {
   const options = readFileSync(join(ROOT, "src/pages/options/options.html"), "utf8");
   assert.match(options, /<h1>FoFlow<\/h1>/u);
 });
+
+test("every message a page sends has a handler in the worker", () => {
+  const worker = readFileSync(join(ROOT, "src/background/service-worker.js"), "utf8");
+  const handled = new Set(
+    [...worker.matchAll(/^\s{2}"([a-z]+:[a-zA-Z]+)":/gmu)].map((match) => match[1]),
+  );
+  const sent = new Set();
+  for (const file of sources) {
+    if (file.includes("service-worker")) continue;
+    const code = readFileSync(file, "utf8");
+    for (const match of code.matchAll(/type:\s*"([a-z]+:[a-zA-Z]+)"/gu)) sent.add(match[1]);
+  }
+  assert.ok(sent.size > 8, "pages do use the message channel");
+  const unanswered = [...sent].filter((type) => !handled.has(type));
+  assert.deepEqual(unanswered, [], "a page asks for something no one answers");
+});
+
+test("every string a page asks for exists", () => {
+  const messages = readFileSync(join(ROOT, "src/lib/messages.js"), "utf8");
+  const defined = new Set([...messages.matchAll(/^\s{2}([a-z_0-9]+):/gmu)].map((match) => match[1]));
+  const asked = new Map();
+  for (const file of sources) {
+    const code = readFileSync(file, "utf8");
+    for (const match of code.matchAll(/m\(\s*"([a-z_0-9]+)"/gu)) {
+      if (!asked.has(match[1])) asked.set(match[1], relative(ROOT, file));
+    }
+  }
+  const missing = [...asked].filter(([key]) => !defined.has(key));
+  assert.deepEqual(missing, [], "a page asks for a string that is not written");
+});
+
+test("every page boots its theme before it paints", () => {
+  const pages = walk(join(ROOT, "src/pages")).filter((file) => file.endsWith(".html"));
+  assert.ok(pages.length >= 4, "the four surfaces are in the package");
+  for (const page of pages) {
+    const html = readFileSync(page, "utf8");
+    const head = html.slice(0, html.indexOf("</head>"));
+    assert.match(
+      head,
+      /<script src="[^"]*ui\/theme-boot\.js"><\/script>/u,
+      `${relative(ROOT, page)} reads the stored theme in its head`,
+    );
+    assert.doesNotMatch(
+      head,
+      /<script type="module"/u,
+      `${relative(ROOT, page)} must not defer its theme boot`,
+    );
+  }
+});

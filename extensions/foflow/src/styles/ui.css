@@ -377,6 +377,9 @@ textarea {
   min-inline-size: 176px;
   padding: 6px;
   border-radius: var(--radius-control);
+  max-block-size: calc(100vh - 16px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   background: var(--color-menu);
   box-shadow: var(--shadow-float);
   color: var(--color-text);

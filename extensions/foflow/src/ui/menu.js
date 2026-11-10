@@ -12,7 +12,7 @@ export function closeMenu() {
   const { node, onClose, trigger } = open;
   open = null;
   document.removeEventListener("pointerdown", outside, true);
-  document.removeEventListener("keydown", escape, true);
+  document.removeEventListener("keydown", keys, true);
   window.removeEventListener("resize", reposition, true);
   window.removeEventListener("scroll", reposition, true);
   node.remove();
@@ -26,10 +26,35 @@ function outside(event) {
   closeMenu();
 }
 
-function escape(event) {
-  if (event.key !== "Escape") return;
-  event.preventDefault();
-  closeMenu();
+/** Escape closes the menu and goes no further, so the page behind it does not
+ *  also react to the key; the arrows walk the items, Home and End jump. */
+function keys(event) {
+  if (open === null) return;
+  const items = [...open.node.querySelectorAll(".menu-item")];
+  if (event.key === "Escape") {
+    event.preventDefault();
+    event.stopPropagation();
+    const trigger = open.trigger;
+    closeMenu();
+    trigger?.focus();
+    return;
+  }
+  if (items.length === 0) return;
+  if (event.key === "Tab") {
+    // Tabbing out closes the menu, as a native menu would.
+    closeMenu();
+    return;
+  }
+  const at = items.indexOf(document.activeElement);
+  const move = (to) => {
+    event.preventDefault();
+    event.stopPropagation();
+    items[(to + items.length) % items.length].focus();
+  };
+  if (event.key === "ArrowDown") move(at + 1);
+  else if (event.key === "ArrowUp") move(at - 1);
+  else if (event.key === "Home") move(0);
+  else if (event.key === "End") move(items.length - 1);
 }
 
 function reposition() {
@@ -45,11 +70,19 @@ function place(node, trigger, align) {
   const viewportWidth = document.documentElement.clientWidth;
   const viewportHeight = document.documentElement.clientHeight;
 
+  // A long menu in a short popup scrolls rather than running off the screen.
+  node.style.maxBlockSize = `${Math.max(120, viewportHeight - 16)}px`;
+  const usable = Math.min(height, viewportHeight - 16);
   let left = align === "end" ? box.right - width : box.left;
   left = Math.min(Math.max(8, left), Math.max(8, viewportWidth - width - 8));
   let top = box.bottom + margin;
-  if (top + height > viewportHeight - 8 && box.top - margin - height > 8) {
-    top = box.top - margin - height;
+  const fitsBelow = top + usable <= viewportHeight - 8;
+  const fitsAbove = box.top - margin - usable > 8;
+  if (!fitsBelow && fitsAbove) {
+    top = box.top - margin - usable;
+  } else if (!fitsBelow && !fitsAbove) {
+    // Neither side has room: take the larger one and scroll.
+    top = box.top > viewportHeight - box.bottom ? Math.max(8, viewportHeight - usable - 8) : 8;
   }
   node.style.left = `${Math.round(left)}px`;
   node.style.top = `${Math.round(top)}px`;
@@ -104,11 +137,11 @@ export function openMenu(trigger, { items, align = "start", label, onClose }) {
   place(node, trigger, align);
   open = { node, trigger, onClose, align };
   document.addEventListener("pointerdown", outside, true);
-  document.addEventListener("keydown", escape, true);
+  document.addEventListener("keydown", keys, true);
   window.addEventListener("resize", reposition, true);
   window.addEventListener("scroll", reposition, true);
-  // The first item takes focus so the keyboard can walk the menu at once.
-  node.querySelector(".menu-item")?.focus();
+  // The chosen item takes focus, so the keyboard starts at the current value.
+  (node.querySelector('[aria-checked="true"].menu-item') ?? node.querySelector(".menu-item"))?.focus();
   return node;
 }
 

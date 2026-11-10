@@ -3,6 +3,8 @@
 
 body {
   inline-size: 340px;
+  max-block-size: 600px;
+  overflow-y: auto;
   background: var(--color-chrome);
 }
 
@@ -405,10 +407,4 @@ body {
   padding: 0;
   justify-items: start;
   text-align: start;
-}
-
-/* A popup is short; the menu must never be cut off by its own body. */
-.menu {
-  max-block-size: 320px;
-  overflow-y: auto;
 }
