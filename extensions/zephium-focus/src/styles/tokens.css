@@ -1,0 +1,439 @@
+/* The browser's semantic tokens, copied from `frame/src/styles/tokens.css`:
+   dark is the base and the light block mirrors it by luminance, so the same
+   surface arrives at night and by day. Extensions cannot use Tailwind's
+   @theme, so the names are carried here and nothing else. */
+:root {
+  color-scheme: dark;
+
+  --color-canvas: #1a1a1d;
+  --color-page: #1a1a1d;
+  --color-chrome: #1f1f22;
+  --color-surface: #26262a;
+  --color-raised: #2c2c30;
+
+  --color-fill: rgb(255 255 255 / 0.05);
+  --color-fill-hover: rgb(255 255 255 / 0.08);
+  --color-fill-pressed: rgb(255 255 255 / 0.16);
+  --color-card: rgb(255 255 255 / 0.05);
+  --color-tile: rgb(255 255 255 / 0.06);
+  --color-tile-hover: rgb(255 255 255 / 0.1);
+
+  --color-border: rgb(255 255 255 / 0.07);
+  --color-border-strong: rgb(255 255 255 / 0.13);
+  --row-hover: rgb(255 255 255 / 0.04);
+  --row-active: rgb(255 255 255 / 0.075);
+  --row-rim: inset 0 0 0 1px rgb(255 255 255 / 0.06);
+
+  --color-text: #f4f4f6;
+  --color-label-secondary: #d8d8db;
+  --color-muted: rgb(244 244 246 / 0.68);
+  --color-faint: rgb(244 244 246 / 0.44);
+
+  --color-field: rgb(255 255 255 / 0.09);
+  --color-field-hover: rgb(255 255 255 / 0.12);
+  --color-field-ring: rgb(255 255 255 / 0.16);
+  --shadow-field: inset 0 0 0 1px rgb(255 255 255 / 0.06);
+  --shadow-field-focus: inset 0 0 0 1px var(--color-field-ring);
+
+  --color-control: rgb(255 255 255 / 0.09);
+  --color-control-hover: rgb(255 255 255 / 0.13);
+  --color-control-pressed: rgb(255 255 255 / 0.17);
+  /* The start button is the one white plate on the card. */
+  --color-primary: #f4f4f6;
+  --color-primary-hover: #ffffff;
+  --color-on-primary: #1a1a1d;
+  --color-on-control: var(--color-text);
+
+  --color-track: rgb(255 255 255 / 0.14);
+  --color-ring: rgb(255 255 255 / 0.5);
+  --color-danger: #ef8a8e;
+  --color-soft-mint: #88d0b3;
+
+  --radius-capsule: 999px;
+  --radius-control: 14px;
+  --radius-control-compact: 10px;
+  --radius-card: 18px;
+  --radius-row: 12px;
+  --radius-field: 10px;
+
+  --text-caption: 11px;
+  --text-label: 12px;
+  --text-body: 13px;
+  --text-page-title: 14px;
+  --text-title: 22px;
+  --text-display: 36px;
+
+  --field-height: 24px;
+  --control-height: 24px;
+  --control-inset: 10px;
+
+  --motion-fast: 120ms;
+  --motion-slow: 300ms;
+  --motion-page: 400ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-emphasized: cubic-bezier(0.2, 0.9, 0.2, 1);
+
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI Variable Text", "Segoe UI", "Noto Sans",
+    "Cantarell", sans-serif;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color-scheme: light;
+
+    --color-canvas: #f4f4f5;
+    --color-page: #f4f4f5;
+    --color-chrome: #fbfbfc;
+    --color-surface: #ffffff;
+    --color-raised: #ffffff;
+
+    --color-fill: rgb(24 24 27 / 0.05);
+    --color-fill-hover: rgb(24 24 27 / 0.08);
+    --color-fill-pressed: rgb(24 24 27 / 0.11);
+    --color-card: rgb(255 255 255 / 0.92);
+    --color-tile: rgb(255 255 255 / 0.92);
+    --color-tile-hover: #ffffff;
+
+    --color-border: rgb(0 0 0 / 0.07);
+    --color-border-strong: rgb(0 0 0 / 0.13);
+    --row-hover: rgb(24 24 27 / 0.04);
+    --row-active: rgb(24 24 27 / 0.07);
+    --row-rim: inset 0 0 0 1px rgb(24 24 27 / 0.03);
+
+    --color-text: #1c1c1f;
+    --color-label-secondary: #55555c;
+    --color-muted: rgb(28 28 31 / 0.62);
+    --color-faint: rgb(28 28 31 / 0.42);
+
+    --color-field: rgb(228 228 230 / 0.7);
+    --color-field-hover: rgb(170 170 170 / 0.2);
+    --color-field-ring: rgb(0 0 0 / 0.14);
+    --shadow-field: inset 0 0 0 1px rgb(0 0 0 / 0.05);
+    --shadow-field-focus: inset 0 0 0 1px var(--color-field-ring);
+
+    --color-control: #ffffff;
+    --color-control-hover: #f9f9f9;
+    --color-control-pressed: #f0f0f0;
+    --color-primary: #1c1c1f;
+    --color-primary-hover: #000000;
+    --color-on-primary: #fbfbfc;
+    --color-on-control: var(--color-text);
+
+    --color-track: #d7d7da;
+    --color-ring: rgb(0 0 0 / 0.45);
+    --color-danger: #c0393f;
+    --color-soft-mint: #2f7d5c;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  background: var(--color-canvas);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-ring);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* ------------------------------------------------------------------ cards */
+
+.card {
+  padding: 14px;
+  border-radius: var(--radius-card);
+  background: var(--color-card);
+  box-shadow: var(--row-rim);
+}
+
+.card.page {
+  padding: 20px;
+}
+
+.card h3 {
+  margin: 0;
+  font-size: var(--text-page-title);
+  font-weight: 600;
+}
+
+.card .help {
+  margin: 4px 0 12px;
+  color: var(--color-muted);
+  font-size: var(--text-label);
+  line-height: 1.5;
+}
+
+/* ---------------------------------------------------------------- buttons */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: 26px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: var(--radius-capsule);
+  background: var(--color-control);
+  color: var(--color-on-control);
+  font-size: var(--text-label);
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--motion-fast) var(--ease-out),
+    scale var(--motion-fast) var(--ease-out),
+    opacity var(--motion-fast) var(--ease-out);
+}
+
+.button:hover:not(:disabled) {
+  background: var(--color-control-hover);
+}
+
+.button:active:not(:disabled) {
+  scale: 0.97;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.button.primary {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.button.primary:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.button.ghost {
+  background: transparent;
+  color: var(--color-muted);
+}
+
+.button.ghost:hover:not(:disabled) {
+  background: var(--color-fill);
+  color: var(--color-text);
+}
+
+.button.danger {
+  background: color-mix(in srgb, var(--color-danger) 16%, transparent);
+  color: var(--color-danger);
+}
+
+.button.danger:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-danger) 24%, transparent);
+}
+
+.button.regular {
+  min-height: 30px;
+  padding: 0 15px;
+  border-radius: var(--radius-control);
+  font-size: var(--text-body);
+}
+
+.icon-button {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 24px;
+  block-size: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-capsule);
+  background: transparent;
+  color: var(--color-muted);
+  cursor: pointer;
+}
+
+.icon-button:hover {
+  background: var(--color-fill);
+  color: var(--color-text);
+}
+
+/* A pending control keeps its width and dots over, as the browser's does. */
+.button .pending {
+  display: inline-flex;
+  gap: 3px;
+}
+
+.button .pending i {
+  inline-size: 4px;
+  block-size: 4px;
+  border-radius: 50%;
+  background: currentcolor;
+  animation: pending 900ms ease-in-out infinite;
+}
+
+.button .pending i:nth-child(2) {
+  animation-delay: 150ms;
+}
+
+.button .pending i:nth-child(3) {
+  animation-delay: 300ms;
+}
+
+@keyframes pending {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ------------------------------------------------------------------ misc */
+
+.caption {
+  color: var(--color-faint);
+  font-size: var(--text-caption);
+}
+
+.field {
+  flex: 1;
+  min-width: 0;
+  block-size: 26px;
+  padding-inline: var(--control-inset);
+  border: 0;
+  border-radius: var(--radius-field);
+  background: var(--color-field);
+  box-shadow: var(--shadow-field);
+  color: var(--color-text);
+  font-size: var(--text-label);
+}
+
+.field::placeholder {
+  color: var(--color-faint);
+}
+
+.field:hover {
+  background: var(--color-field-hover);
+}
+
+.field:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-field-focus);
+}
+
+.segmented {
+  display: inline-flex;
+  padding: 2px;
+  border-radius: var(--radius-capsule);
+  background: var(--color-fill);
+}
+
+.segmented button {
+  padding: 3px 12px;
+  border: 0;
+  border-radius: var(--radius-capsule);
+  background: transparent;
+  color: var(--color-muted);
+  font-size: var(--text-label);
+  cursor: pointer;
+}
+
+.segmented button[aria-pressed="true"] {
+  background: var(--color-control);
+  box-shadow: var(--row-rim);
+  color: var(--color-text);
+}
+
+.switch {
+  position: relative;
+  flex: none;
+  inline-size: 34px;
+  block-size: 20px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-capsule);
+  background: var(--color-field);
+  box-shadow: var(--shadow-field);
+  cursor: pointer;
+  transition: background-color var(--motion-fast) var(--ease-out);
+}
+
+.switch::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 2px;
+  inset-inline-start: 2px;
+  inline-size: 16px;
+  block-size: 16px;
+  border-radius: 50%;
+  background: var(--color-text);
+  transition: translate var(--motion-fast) var(--ease-out);
+}
+
+.switch[aria-checked="true"] {
+  background: var(--color-soft-mint);
+}
+
+.switch[aria-checked="true"]::after {
+  translate: 14px 0;
+  background: #10201a;
+}
+
+.visually-hidden {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.empty {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 24px 16px;
+  text-align: center;
+}
+
+.empty h2 {
+  margin: 0;
+  font-size: var(--text-body);
+  font-weight: 600;
+}
+
+.empty p {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: var(--text-label);
+}

@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Focus</title>
+    <link rel="icon" href="../../assets/icons/32.png" />
+    <link rel="stylesheet" href="../../styles/tokens.css" />
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <div class="popup">
+      <div class="head">
+        <span class="title">Time</span>
+        <div class="head-actions">
+          <button type="button" class="icon-button" id="open-page" aria-label="Open Time page">
+            <span id="open-glyph" aria-hidden="true"></span>
+          </button>
+          <button type="button" class="icon-button" id="settings" aria-label="Settings">
+            <span id="settings-glyph" aria-hidden="true"></span>
+          </button>
+        </div>
+      </div>
+      <div id="focus"></div>
+      <div id="stats"></div>
+      <div id="sites"></div>
+      <p class="local" id="local"></p>
+    </div>
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>
