@@ -509,8 +509,10 @@ textarea {
     stroke var(--motion-slow) var(--ease-out);
 }
 
+/* At rest the ring is a plain track. The arc has nothing to say yet, so it is
+   not drawn at all — a bright circle at 25 minutes would read as progress. */
 .ring.rest .arc {
-  stroke: var(--color-accent);
+  stroke: transparent;
 }
 
 .ring .center {
@@ -591,8 +593,8 @@ textarea {
   inset: 50% auto auto 50%;
   display: grid;
   justify-items: center;
-  gap: 0;
-  padding: var(--space-2) var(--space-3);
+  gap: 1px;
+  padding: 6px 10px;
   border: 0;
   border-radius: var(--radius-control);
   background: transparent;
@@ -609,7 +611,7 @@ textarea {
 }
 
 .focus .length {
-  font-size: 44px;
+  font-size: 38px;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.03em;
@@ -625,7 +627,7 @@ textarea {
 }
 
 .focus .clock {
-  font-size: 34px;
+  font-size: 28px;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;
@@ -642,35 +644,22 @@ textarea {
   }
 }
 
-.focus.page .body {
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-4);
+.focus .facts {
+  align-content: center;
 }
 
-.focus.page .facts {
-  justify-items: center;
-  text-align: center;
-}
-
-.focus.page .actions {
-  justify-content: center;
-  margin-block-start: var(--space-1);
-}
-
-.focus.page .shut {
-  text-align: center;
+.focus .facts h3 {
+  margin: 0 0 2px;
 }
 
 .focus .facts {
   display: grid;
-  gap: 3px;
+  gap: 2px;
   justify-items: start;
   min-width: 0;
 }
 
 .focus .facts h3 {
-  margin: 0;
   font-size: var(--text-page-title);
   font-weight: 600;
   letter-spacing: -0.01em;
@@ -700,8 +689,8 @@ textarea {
 .focus .actions {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-2);
-  margin-block-start: var(--space-2);
+  gap: 8px;
+  margin-block-start: 12px;
 }
 
 .focus .failed {
@@ -876,13 +865,14 @@ textarea {
 
 .sites .head {
   display: grid;
-  grid-template-columns: 18px minmax(0, 1fr) 52px 60px 64px;
-  gap: 14px;
-  padding: 2px 12px 8px;
-  color: var(--color-faint);
+  grid-template-columns: 18px minmax(0, 1fr) 44px 50px 44px;
+  gap: 12px;
+  padding: 0 12px 6px;
+  color: var(--color-muted);
   font-size: var(--text-caption);
+  font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
 }
 
 .sites .head span:nth-child(3),
@@ -892,12 +882,12 @@ textarea {
 
 .sites .row {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) 52px 60px 64px;
+  grid-template-columns: auto minmax(0, 1fr) 44px 50px 44px;
   grid-template-rows: auto auto;
   align-items: center;
-  gap: 9px 14px;
+  gap: 7px 12px;
   inline-size: 100%;
-  padding: 11px 12px 12px;
+  padding: 10px 12px 9px;
   border: 0;
   border-radius: var(--radius-row);
   background: transparent;
@@ -921,6 +911,7 @@ textarea {
   grid-column: 2;
   overflow: hidden;
   font-size: var(--text-body);
+  font-weight: 500;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -933,6 +924,10 @@ textarea {
 }
 
 .sites .row .spent {
+  grid-column: 5;
+}
+
+.sites .row .spent {
   color: var(--color-text);
   font-size: var(--text-label);
   font-variant-numeric: tabular-nums;
@@ -941,7 +936,7 @@ textarea {
 
 .sites .row .meter {
   grid-column: 2 / -1;
-  block-size: 3px;
+  block-size: 2px;
   border-radius: var(--radius-capsule);
   background: color-mix(in srgb, var(--color-text) 8%, transparent);
   overflow: hidden;

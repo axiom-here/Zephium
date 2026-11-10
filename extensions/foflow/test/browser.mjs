@@ -17,11 +17,12 @@ test("the Time page draws a day, a site list and the focus card", { skip }, asyn
   // 2100 of 3480 is 60%, so a share is a real percentage, not a rounding artefact.
   assert.match(text(document.querySelector("#sites")), /60%/u, "a share reads as a share");
   assert.match(text(document.querySelector("#sites")), /26%/u);
-  // The day is one filled area with a marker per hour.
-  assert.equal(document.querySelectorAll(".plot .marker").length, 24);
+  // The day is one column per hour, each with its own track.
+  assert.equal(document.querySelectorAll(".plot .column").length, 24);
   assert.equal(document.querySelectorAll(".plot .ticks span").length, 8);
-  assert.match(document.querySelector(".plot .line").getAttribute("d"), /^M[\d.]+,[\d.]+ C/u);
-  assert.match(document.querySelector(".plot .fill-area").getAttribute("d"), /Z$/u);
+  assert.ok(document.querySelectorAll(".plot .rule").length >= 2, "the plot has its rules");
+  // The peak is 58m, so the axis steps in half hours: 1h reads top-down.
+  assert.match(text(document.querySelector(".plot")), /^30m1h/u, "the axis values are written in");
   assert.match(text(document.querySelector("#focus")), /Start focus/u);
   assert.equal(document.querySelectorAll("#shut-editor .shut-list li").length, 1);
 });

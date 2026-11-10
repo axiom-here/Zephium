@@ -63,7 +63,7 @@ test("the Time page's back button and settings are both in the toolbar", { skip 
   assert.ok(back, "a back button exists");
   assert.equal(back.getAttribute("aria-label"), "Back", "it is labelled for a screen reader");
   assert.ok(back.querySelector(".arrow svg"), "the arrow is drawn");
-  assert.equal(document.querySelector("#page-title").textContent.trim(), "Time");
+  assert.equal(document.querySelector("#toolbar-title").textContent.trim(), "Time");
   const end = document.querySelectorAll("#toolbar-end .icon-button");
   assert.equal(end.length, 2, "theme and settings");
   assert.ok(
@@ -177,13 +177,13 @@ test("three themes plus the system, applied to the document and remembered", { s
 
   await setTheme("light");
   assert.equal(window.document.documentElement.dataset.theme, "light");
-  assert.equal(read("--color-canvas"), "#f4f4f5");
-  assert.equal(read("--color-text"), "#1c1c1f");
+  assert.equal(read("--color-canvas"), "#f6f7f9");
+  assert.equal(read("--color-text"), "#1b2027");
   assert.equal(store.theme, "light");
   assert.equal(window.localStorage.getItem("foflow-theme"), "light", "the boot mirror follows");
 
   await setTheme("dark");
-  assert.equal(read("--color-canvas"), "#1a1a1d");
+  assert.equal(read("--color-canvas"), "#0d1117");
   await setTheme("system");
   assert.equal(window.document.documentElement.dataset.theme, undefined);
   assert.equal(window.localStorage.getItem("foflow-theme"), null);
@@ -272,9 +272,9 @@ test("a first run reads as empty, not as broken", { skip }, async () => {
   const { document } = await open("src/pages/time/time.html", { empty: true });
   assert.equal(document.querySelector("#total").textContent.trim(), "0m");
   // The chart is still a full day, not a blank box.
-  assert.equal(document.querySelectorAll(".plot .marker").length, 24);
+  assert.equal(document.querySelectorAll(".plot .column").length, 24);
   assert.equal(document.querySelectorAll(".plot .ticks span").length, 8);
-  assert.ok(document.querySelector(".plot .shape"), "the empty day still has its area");
+  assert.equal(document.querySelectorAll(".plot .bar").length, 0, "an empty day draws no bars");
   // An empty list shows its empty state and no column header over it.
   assert.match(text(document.querySelector("#sites")), /Nothing counted yet/u);
   assert.equal(document.querySelectorAll("#sites .head").length, 0);

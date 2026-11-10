@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "FoFlow",
   "short_name": "FoFlow",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Focus rounds that shut chosen sites, and a Time page that shows where the time went. Counted on this device only.",
   "minimum_chrome_version": "116",
   "icons": {

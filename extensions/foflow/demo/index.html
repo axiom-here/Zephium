@@ -54,19 +54,16 @@
         node extensions/foflow/scripts/serve.mjs
     -->
     <header class="toolbar">
+      <span class="brand-mark" id="brand" aria-hidden="true"></span>
       <button type="button" class="back" id="back">
         <span class="arrow" aria-hidden="true"></span>
+        <span class="back-label" id="toolbar-title">Time</span>
       </button>
       <div class="toolbar-end" id="toolbar-end"></div>
     </header>
 
     <main class="scroller">
       <div class="column">
-        <header class="page-head">
-          <h1 id="page-title">Time</h1>
-          <p class="caption" id="page-sub"></p>
-        </header>
-
         <div class="controls">
           <div class="segmented" id="span" role="group" aria-label="Period">
             <button type="button" data-span="day" aria-pressed="true">Day</button>

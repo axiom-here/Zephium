@@ -77,8 +77,8 @@ export function focusCard({
     if (now >= snap.session.phase_ends_ms) void actions.sync().then(onchange);
   }
 
-  const dialSize = () => (size === "page" ? 152 : 120);
-  const dialStroke = () => (size === "page" ? 9 : 7);
+  const dialSize = () => (size === "page" ? 150 : 112);
+  const dialStroke = () => (size === "page" ? 9 : 8);
 
   async function run(task) {
     if (busy) return null;
@@ -159,7 +159,12 @@ export function focusCard({
         el("span", { class: "unit" }, "min", glyphs.chevronDown(10)),
       );
       body.append(
-        el("div", { class: "dial" }, ring({ value: 0, size: dialSize(), stroke: dialStroke() }), lengthButton),
+        el(
+          "div",
+          { class: "dial rest" },
+          ring({ value: 0, size: dialSize(), stroke: dialStroke(), tone: "rest" }),
+          lengthButton,
+        ),
         el(
           "div",
           { class: "facts" },

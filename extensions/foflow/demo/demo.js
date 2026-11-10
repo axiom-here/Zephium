@@ -153,5 +153,9 @@ document.getElementById("cycle-theme")?.addEventListener("click", async () => {
   document.getElementById("cycle-theme").textContent = `Theme: ${THEMES.find((entry) => entry.id === next).label}`;
 });
 
+// The mark, as each real page draws it.
+const { mark } = await import("../src/ui/dom.js");
+document.getElementById("brand")?.append(mark(18));
+
 document.getElementById("span")?.setAttribute("data-preview", "true");
 await import("../src/pages/time/time.js");

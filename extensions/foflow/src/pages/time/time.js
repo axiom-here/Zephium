@@ -4,7 +4,7 @@
 import { bars } from "../../ui/bars.js";
 import { focusCard, shutEditor } from "../../ui/focus-card.js";
 import { siteList, siteMark } from "../../ui/sites.js";
-import { el, fill, glyphs, iconButton } from "../../ui/dom.js";
+import { el, fill, glyphs, iconButton, mark } from "../../ui/dom.js";
 import { themeButton } from "../../ui/theme.js";
 import { m } from "../../lib/messages.js";
 import {
@@ -42,11 +42,12 @@ const $ = (id) => document.getElementById(id);
 // ------------------------------------------------------------------- chrome
 
 function bootToolbar() {
+  $("brand").append(mark(18));
   const back = $("back");
   back.querySelector(".arrow").append(glyphs.arrowLeft(15));
   back.setAttribute("aria-label", m("back"));
   back.setAttribute("title", m("back"));
-  $("page-title").textContent = m("time_title");
+  $("toolbar-title").textContent = m("time_title");
   back.addEventListener("click", () => {
     // Opened from the toolbar or a first run, so the browser's own history
     // decides where back is; a tab with none closes instead.
@@ -261,7 +262,6 @@ function draw() {
   state.total = sum;
   $("total").textContent = duration(sum);
   $("sites-caption").textContent = site === null ? "" : m("time_site_total", { site });
-  $("page-sub").textContent = site === null ? m("time_on_web") : m("time_site_total", { site });
   $("sub").textContent = site !== null ? m("time_site_total", { site }) : m("time_on_web");
 
   const change = site === null && report ? comparison(period, sum, report.previous ?? 0) : null;

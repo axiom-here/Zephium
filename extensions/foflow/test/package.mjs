@@ -6,7 +6,7 @@
 //   node extensions/foflow/test/package.mjs
 import assert from "node:assert/strict";
 import { readFileSync, existsSync, statSync, readdirSync } from "node:fs";
-import { dirname, join, relative } from "node:path";
+import { dirname, join, relative, resolve } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
@@ -44,6 +44,25 @@ test("the manifest names files that are there", () => {
     assert.ok(existsSync(join(ROOT, path)), `the manifest names ${path}, which is missing`);
   }
   assert.equal(manifest.background.type, "module", "the worker uses import, so it must be a module");
+});
+
+test("the icons are the shipped mark, at the sizes the manifest promises", () => {
+  // Chrome reads the PNG header for the size it was promised, so a 32px icon
+  // saved as 48 is silently ignored and the toolbar falls back to a puzzle.
+  for (const [size, path] of Object.entries(manifest.icons)) {
+    const png = readFileSync(join(ROOT, path));
+    assert.equal(png.subarray(1, 4).toString("ascii"), "PNG", `${path} is not a PNG`);
+    assert.equal(png.readUInt32BE(16), Number(size), `${path} is not ${size}px wide`);
+    assert.equal(png.readUInt32BE(20), Number(size), `${path} is not ${size}px tall`);
+  }
+  // Every page carries a favicon that resolves, so the tab shows the mark.
+  for (const page of ["time/time.html", "options/options.html", "popup/popup.html", "cover/cover.html"]) {
+    const html = readFileSync(join(ROOT, "src/pages", page), "utf8");
+    const href = /<link rel="icon" href="([^"]+)"/u.exec(html)?.[1];
+    assert.ok(href, `${page} has no favicon link, so its tab shows a blank page icon`);
+    const file = resolve(ROOT, "src/pages", page, "..", href);
+    assert.ok(existsSync(file), `${page} points its favicon at ${href}, which is missing`);
+  }
 });
 
 test("every path the code opens exists in the package", () => {
