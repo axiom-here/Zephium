@@ -15,7 +15,7 @@ export function siteList({ sites, total, size = "panel", selected = null, onsele
 
   function render() {
     fill(root);
-    if (size === "page") {
+    if (size === "page" && sites.length > 0) {
       root.append(
         el(
           "li",

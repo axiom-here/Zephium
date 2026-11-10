@@ -21,7 +21,7 @@ export { JSDOM };
 export const skip = JSDOM === null ? "jsdom is not installed (npm install --no-save jsdom)" : false;
 
 /** The service worker, answered locally. `session` seeds a running round. */
-export function engine({ session = null } = {}) {
+export function engine({ session = null, empty = false } = {}) {
   const settings = {
     minutes: 25,
     breaks: false,
@@ -33,15 +33,26 @@ export function engine({ session = null } = {}) {
     retentionDays: 90,
     suggestions: ["youtube.com"],
   };
-  const report = {
-    span: "day",
-    start: 0,
-    buckets: Array.from({ length: 24 }, (_, hour) => (hour === 9 ? 3480 : 0)),
-    total: 3480,
-    previous: 0,
-    sites: [{ site: "youtube.com", seconds: 3480, opens: 3, series: Array(24).fill(0) }],
-    suggestions: ["youtube.com"],
-  };
+  // A first run has nothing counted, which is a layout of its own.
+  const report = empty
+    ? {
+        span: "day",
+        start: 0,
+        buckets: Array(24).fill(0),
+        total: 0,
+        previous: 0,
+        sites: [],
+        suggestions: [],
+      }
+    : {
+        span: "day",
+        start: 0,
+        buckets: Array.from({ length: 24 }, (_, hour) => (hour === 9 ? 3480 : 0)),
+        total: 3480,
+        previous: 0,
+        sites: [{ site: "youtube.com", seconds: 3480, opens: 3, series: Array(24).fill(0) }],
+        suggestions: ["youtube.com"],
+      };
   const storage = {};
   const snapshot = () => ({ session, ...settings, now: Date.now() });
   return {
@@ -109,7 +120,7 @@ export function engine({ session = null } = {}) {
 }
 
 /** Opens a page with its stylesheets spliced in, since a DOM does not fetch. */
-export async function open(page, { search = "", session = null } = {}) {
+export async function open(page, { search = "", session = null, empty = false } = {}) {
   const file = join(ROOT, page);
   const html = readFileSync(file, "utf8");
   // A real extension page has a storage origin; file: does not, and the theme
@@ -136,7 +147,7 @@ export async function open(page, { search = "", session = null } = {}) {
   bind("matchMedia", () => ({ matches: false, addEventListener() {} }));
   bind("getComputedStyle", window.getComputedStyle.bind(window));
   bind("localStorage", window.localStorage);
-  const harness = engine({ session });
+  const harness = engine({ session, empty });
   harness.calls = [];
   const send = harness.chrome.runtime.sendMessage.bind(harness.chrome.runtime);
   harness.chrome.runtime.sendMessage = (message, reply) => {

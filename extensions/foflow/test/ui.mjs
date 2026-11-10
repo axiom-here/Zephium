@@ -9,7 +9,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
-import { JSDOM, ROOT, open, settle, skip } from "./dom.mjs";
+import { JSDOM, ROOT, open, settle, skip, text } from "./dom.mjs";
 
 /** Declarations from every sheet on the page, for a selector and property. */
 function declaration(document, selector, property) {
@@ -262,6 +262,22 @@ test("the cover says why, how long, and offers both ways out", { skip }, async (
   assert.match(body, /Allow 5 minutes/u);
   assert.match(body, /End focus/u);
   assert.ok(document.querySelector(".ring-wrap .ring svg"));
+});
+
+test("a first run reads as empty, not as broken", { skip }, async () => {
+  const { document } = await open("src/pages/time/time.html", { empty: true });
+  assert.equal(document.querySelector("#total").textContent.trim(), "0m");
+  // The chart is still a full day of empty columns, not a blank box.
+  assert.equal(document.querySelectorAll(".bars .column").length, 24);
+  assert.equal(document.querySelectorAll(".bars .ticks span").length, 8);
+  // An empty list shows its empty state and no column header over it.
+  assert.match(text(document.querySelector("#sites")), /Nothing counted yet/u);
+  assert.equal(document.querySelectorAll("#sites .head").length, 0);
+  assert.equal(document.querySelectorAll("#sites .row").length, 0);
+
+  const popup = await open("src/pages/popup/popup.html", { empty: true });
+  assert.match(text(popup.document.querySelector("#stats")), /0m/u);
+  assert.match(text(popup.document.querySelector("#sites")), /Nothing counted yet|Time on the web/u);
 });
 
 test("every stylesheet survives parsing, and shared components stay shared", { skip }, async () => {
