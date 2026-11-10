@@ -5,19 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>FoFlow — preview</title>
     <link rel="stylesheet" href="../src/styles/tokens.css" />
+    <link rel="stylesheet" href="../src/styles/ui.css" />
     <link rel="stylesheet" href="../src/pages/time/time.css" />
+    <script src="../src/ui/theme-boot.js"></script>
     <style>
       .demo-note {
         position: fixed;
         inset-block-end: 12px;
         inset-inline-end: 12px;
-        padding: 6px 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 6px 6px 12px;
         border-radius: var(--radius-capsule);
-        background: var(--color-surface);
-        box-shadow: var(--row-rim);
+        background: var(--color-card);
+        box-shadow: var(--shadow-float);
         color: var(--color-muted);
         font-size: var(--text-caption);
         z-index: 20;
+      }
+
+      .demo-note .link {
+        padding: 3px 9px;
+        border: 0;
+        border-radius: var(--radius-capsule);
+        background: var(--color-fill);
+        color: var(--color-text);
+        font: inherit;
+        font-weight: 500;
+        cursor: pointer;
+      }
+
+      .demo-note .link:hover {
+        background: var(--color-fill-hover);
       }
     </style>
   </head>
@@ -30,15 +50,11 @@
         node extensions/foflow/scripts/serve.mjs
     -->
     <header class="toolbar">
-      <button type="button" class="icon-button back" id="back" aria-label="Back">
+      <button type="button" class="back" id="back">
         <span class="arrow" aria-hidden="true"></span>
       </button>
-      <h1>Time</h1>
-      <div class="toolbar-end">
-        <button type="button" class="icon-button" id="settings-open" aria-label="Settings">
-          <span class="glyph" aria-hidden="true"></span>
-        </button>
-      </div>
+      <span class="toolbar-title" id="toolbar-title">Time</span>
+      <div class="toolbar-end" id="toolbar-end"></div>
     </header>
 
     <main class="scroller">
@@ -105,13 +121,13 @@
               </p>
               <div id="shut-editor"></div>
             </section>
-            <p class="local"><span class="lock" aria-hidden="true"></span>Counted on this device only</p>
+            <p class="local" id="local"></p>
           </aside>
         </div>
       </div>
     </main>
 
-    <p class="demo-note">Preview with sample data</p>
+    <p class="demo-note">Preview with sample data · <button type="button" class="link" id="cycle-theme">Change theme</button></p>
     <script type="module" src="demo.js"></script>
   </body>
 </html>

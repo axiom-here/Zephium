@@ -1,7 +1,11 @@
-/* The browser's semantic tokens, copied from `frame/src/styles/tokens.css`:
-   dark is the base and the light block mirrors it by luminance, so the same
-   surface arrives at night and by day. Extensions cannot use Tailwind's
-   @theme, so the names are carried here and nothing else. */
+/* Semantic tokens: the only names components may use. Dark is the base; light
+   and Catppuccin Mocha are complete mirrors of it, so every surface is built
+   from the same names and a theme changes nothing but the values.
+
+   The theme is an attribute on <html>, set before first paint by the inline
+   script in each page's head: unset means "follow the system", which is why
+   the light block is guarded against the two explicit dark choices. */
+
 :root {
   color-scheme: dark;
 
@@ -10,6 +14,7 @@
   --color-chrome: #1f1f22;
   --color-surface: #26262a;
   --color-raised: #2c2c30;
+  --color-float: #3d3d44;
 
   --color-fill: rgb(255 255 255 / 0.05);
   --color-fill-hover: rgb(255 255 255 / 0.08);
@@ -47,7 +52,16 @@
   --color-track: rgb(255 255 255 / 0.14);
   --color-ring: rgb(255 255 255 / 0.5);
   --color-danger: #ef8a8e;
-  --color-soft-mint: #88d0b3;
+  --color-danger-wash: color-mix(in srgb, var(--color-danger) 16%, transparent);
+  /* One accent per theme: the switch, the chosen item, the rest ring. */
+  --color-accent: #88d0b3;
+  --color-accent-ink: #10201a;
+  --color-accent-wash: color-mix(in srgb, var(--color-accent) 16%, transparent);
+
+  /* Menus and popovers float above the page, so they need a real shadow. */
+  --shadow-float: 0 18px 44px rgb(0 0 0 / 0.42), 0 2px 8px rgb(0 0 0 / 0.28);
+  --color-menu: color-mix(in srgb, var(--color-float) 62%, var(--color-surface));
+  --color-menu-separator: rgb(255 255 255 / 0.1);
 
   --radius-capsule: 999px;
   --radius-control: 14px;
@@ -63,8 +77,8 @@
   --text-title: 22px;
   --text-display: 36px;
 
-  --field-height: 24px;
-  --control-height: 24px;
+  --field-height: 26px;
+  --row-height: 46px;
   --control-inset: 10px;
 
   --motion-fast: 120ms;
@@ -78,8 +92,9 @@
     "Cantarell", sans-serif;
 }
 
+/* Light, but only when the reader has not asked for an explicit dark theme. */
 @media (prefers-color-scheme: light) {
-  :root {
+  :root:not([data-theme="dark"], [data-theme="mocha"]) {
     color-scheme: light;
 
     --color-canvas: #f4f4f5;
@@ -87,6 +102,7 @@
     --color-chrome: #fbfbfc;
     --color-surface: #ffffff;
     --color-raised: #ffffff;
+    --color-float: #ffffff;
 
     --color-fill: rgb(24 24 27 / 0.05);
     --color-fill-hover: rgb(24 24 27 / 0.08);
@@ -99,7 +115,7 @@
     --color-border-strong: rgb(0 0 0 / 0.13);
     --row-hover: rgb(24 24 27 / 0.04);
     --row-active: rgb(24 24 27 / 0.07);
-    --row-rim: inset 0 0 0 1px rgb(24 24 27 / 0.03);
+    --row-rim: inset 0 0 0 1px rgb(24 24 27 / 0.04);
 
     --color-text: #1c1c1f;
     --color-label-secondary: #55555c;
@@ -123,317 +139,120 @@
     --color-track: #d7d7da;
     --color-ring: rgb(0 0 0 / 0.45);
     --color-danger: #c0393f;
-    --color-soft-mint: #2f7d5c;
+    --color-accent: #2f7d5c;
+    --color-accent-ink: #f7fffb;
+
+    --shadow-float: 0 18px 44px rgb(24 24 27 / 0.16), 0 2px 8px rgb(24 24 27 / 0.08);
+    --color-menu: #ffffff;
+    --color-menu-separator: rgb(0 0 0 / 0.08);
   }
 }
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
+/* Explicit light: the same block, chosen rather than inherited. */
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --color-canvas: #f4f4f5;
+  --color-page: #f4f4f5;
+  --color-chrome: #fbfbfc;
+  --color-surface: #ffffff;
+  --color-raised: #ffffff;
+  --color-float: #ffffff;
+
+  --color-fill: rgb(24 24 27 / 0.05);
+  --color-fill-hover: rgb(24 24 27 / 0.08);
+  --color-fill-pressed: rgb(24 24 27 / 0.11);
+  --color-card: rgb(255 255 255 / 0.92);
+  --color-tile: rgb(255 255 255 / 0.92);
+  --color-tile-hover: #ffffff;
+
+  --color-border: rgb(0 0 0 / 0.07);
+  --color-border-strong: rgb(0 0 0 / 0.13);
+  --row-hover: rgb(24 24 27 / 0.04);
+  --row-active: rgb(24 24 27 / 0.07);
+  --row-rim: inset 0 0 0 1px rgb(24 24 27 / 0.04);
+
+  --color-text: #1c1c1f;
+  --color-label-secondary: #55555c;
+  --color-muted: rgb(28 28 31 / 0.62);
+  --color-faint: rgb(28 28 31 / 0.42);
+
+  --color-field: rgb(228 228 230 / 0.7);
+  --color-field-hover: rgb(170 170 170 / 0.2);
+  --color-field-ring: rgb(0 0 0 / 0.14);
+  --shadow-field: inset 0 0 0 1px rgb(0 0 0 / 0.05);
+  --shadow-field-focus: inset 0 0 0 1px var(--color-field-ring);
+
+  --color-control: #ffffff;
+  --color-control-hover: #f9f9f9;
+  --color-control-pressed: #f0f0f0;
+  --color-primary: #1c1c1f;
+  --color-primary-hover: #000000;
+  --color-on-primary: #fbfbfc;
+  --color-on-control: var(--color-text);
+
+  --color-track: #d7d7da;
+  --color-ring: rgb(0 0 0 / 0.45);
+  --color-danger: #c0393f;
+  --color-accent: #2f7d5c;
+  --color-accent-ink: #f7fffb;
+
+  --shadow-float: 0 18px 44px rgb(24 24 27 / 0.16), 0 2px 8px rgb(24 24 27 / 0.08);
+  --color-menu: #ffffff;
+  --color-menu-separator: rgb(0 0 0 / 0.08);
 }
 
-html,
-body {
-  margin: 0;
-  min-height: 100%;
-}
+/* Catppuccin Mocha, the official palette: a dark theme with a violet accent
+   rather than the base theme's neutral ladder. */
+:root[data-theme="mocha"] {
+  color-scheme: dark;
 
-body {
-  background: var(--color-canvas);
-  color: var(--color-text);
-  font-family: var(--font-sans);
-  font-size: var(--text-body);
-  font-optical-sizing: auto;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
+  --color-canvas: #11111b;
+  --color-page: #1e1e2e;
+  --color-chrome: #181825;
+  --color-surface: #313244;
+  --color-raised: #45475a;
+  --color-float: #45475a;
 
-button,
-input,
-select {
-  font: inherit;
-  color: inherit;
-}
+  --color-fill: rgb(205 214 244 / 0.06);
+  --color-fill-hover: rgb(205 214 244 / 0.1);
+  --color-fill-pressed: rgb(205 214 244 / 0.16);
+  --color-card: rgb(49 50 68 / 0.72);
+  --color-tile: rgb(205 214 244 / 0.07);
+  --color-tile-hover: rgb(205 214 244 / 0.12);
 
-:focus-visible {
-  outline: 2px solid var(--color-ring);
-  outline-offset: 2px;
-}
+  --color-border: rgb(205 214 244 / 0.09);
+  --color-border-strong: rgb(205 214 244 / 0.16);
+  --row-hover: rgb(205 214 244 / 0.05);
+  --row-active: rgb(205 214 244 / 0.1);
+  --row-rim: inset 0 0 0 1px rgb(205 214 244 / 0.08);
 
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation: none !important;
-    transition: none !important;
-  }
-}
+  --color-text: #cdd6f4;
+  --color-label-secondary: #bac2de;
+  --color-muted: #a6adc8;
+  --color-faint: #7f849c;
 
-/* ------------------------------------------------------------------ cards */
+  --color-field: rgb(205 214 244 / 0.1);
+  --color-field-hover: rgb(205 214 244 / 0.14);
+  --color-field-ring: #b4befe;
+  --shadow-field: inset 0 0 0 1px rgb(205 214 244 / 0.1);
+  --shadow-field-focus: inset 0 0 0 1px var(--color-field-ring);
 
-.card {
-  padding: 14px;
-  border-radius: var(--radius-card);
-  background: var(--color-card);
-  box-shadow: var(--row-rim);
-}
+  --color-control: rgb(205 214 244 / 0.1);
+  --color-control-hover: rgb(205 214 244 / 0.16);
+  --color-control-pressed: rgb(205 214 244 / 0.2);
+  --color-primary: #b4befe;
+  --color-primary-hover: #c7d0ff;
+  --color-on-primary: #11111b;
+  --color-on-control: var(--color-text);
 
-.card.page {
-  padding: 20px;
-}
+  --color-track: #45475a;
+  --color-ring: #b4befe;
+  --color-danger: #f38ba8;
+  --color-accent: #cba6f7;
+  --color-accent-ink: #11111b;
 
-.card h3 {
-  margin: 0;
-  font-size: var(--text-page-title);
-  font-weight: 600;
-}
-
-.card .help {
-  margin: 4px 0 12px;
-  color: var(--color-muted);
-  font-size: var(--text-label);
-  line-height: 1.5;
-}
-
-/* ---------------------------------------------------------------- buttons */
-
-.button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  min-height: 26px;
-  padding: 0 12px;
-  border: 0;
-  border-radius: var(--radius-capsule);
-  background: var(--color-control);
-  color: var(--color-on-control);
-  font-size: var(--text-label);
-  font-weight: 500;
-  white-space: nowrap;
-  cursor: pointer;
-  transition:
-    background-color var(--motion-fast) var(--ease-out),
-    scale var(--motion-fast) var(--ease-out),
-    opacity var(--motion-fast) var(--ease-out);
-}
-
-.button:hover:not(:disabled) {
-  background: var(--color-control-hover);
-}
-
-.button:active:not(:disabled) {
-  scale: 0.97;
-}
-
-.button:disabled {
-  opacity: 0.5;
-  cursor: default;
-}
-
-.button.primary {
-  background: var(--color-primary);
-  color: var(--color-on-primary);
-}
-
-.button.primary:hover:not(:disabled) {
-  background: var(--color-primary-hover);
-}
-
-.button.ghost {
-  background: transparent;
-  color: var(--color-muted);
-}
-
-.button.ghost:hover:not(:disabled) {
-  background: var(--color-fill);
-  color: var(--color-text);
-}
-
-.button.danger {
-  background: color-mix(in srgb, var(--color-danger) 16%, transparent);
-  color: var(--color-danger);
-}
-
-.button.danger:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--color-danger) 24%, transparent);
-}
-
-.button.regular {
-  min-height: 30px;
-  padding: 0 15px;
-  border-radius: var(--radius-control);
-  font-size: var(--text-body);
-}
-
-.icon-button {
-  display: inline-grid;
-  place-items: center;
-  inline-size: 24px;
-  block-size: 24px;
-  padding: 0;
-  border: 0;
-  border-radius: var(--radius-capsule);
-  background: transparent;
-  color: var(--color-muted);
-  cursor: pointer;
-}
-
-.icon-button:hover {
-  background: var(--color-fill);
-  color: var(--color-text);
-}
-
-/* A pending control keeps its width and dots over, as the browser's does. */
-.button .pending {
-  display: inline-flex;
-  gap: 3px;
-}
-
-.button .pending i {
-  inline-size: 4px;
-  block-size: 4px;
-  border-radius: 50%;
-  background: currentcolor;
-  animation: pending 900ms ease-in-out infinite;
-}
-
-.button .pending i:nth-child(2) {
-  animation-delay: 150ms;
-}
-
-.button .pending i:nth-child(3) {
-  animation-delay: 300ms;
-}
-
-@keyframes pending {
-  0%,
-  100% {
-    opacity: 0.25;
-  }
-
-  50% {
-    opacity: 1;
-  }
-}
-
-/* ------------------------------------------------------------------ misc */
-
-.caption {
-  color: var(--color-faint);
-  font-size: var(--text-caption);
-}
-
-.field {
-  flex: 1;
-  min-width: 0;
-  block-size: 26px;
-  padding-inline: var(--control-inset);
-  border: 0;
-  border-radius: var(--radius-field);
-  background: var(--color-field);
-  box-shadow: var(--shadow-field);
-  color: var(--color-text);
-  font-size: var(--text-label);
-}
-
-.field::placeholder {
-  color: var(--color-faint);
-}
-
-.field:hover {
-  background: var(--color-field-hover);
-}
-
-.field:focus-visible {
-  outline: none;
-  box-shadow: var(--shadow-field-focus);
-}
-
-.segmented {
-  display: inline-flex;
-  padding: 2px;
-  border-radius: var(--radius-capsule);
-  background: var(--color-fill);
-}
-
-.segmented button {
-  padding: 3px 12px;
-  border: 0;
-  border-radius: var(--radius-capsule);
-  background: transparent;
-  color: var(--color-muted);
-  font-size: var(--text-label);
-  cursor: pointer;
-}
-
-.segmented button[aria-pressed="true"] {
-  background: var(--color-control);
-  box-shadow: var(--row-rim);
-  color: var(--color-text);
-}
-
-.switch {
-  position: relative;
-  flex: none;
-  inline-size: 34px;
-  block-size: 20px;
-  padding: 0;
-  border: 0;
-  border-radius: var(--radius-capsule);
-  background: var(--color-field);
-  box-shadow: var(--shadow-field);
-  cursor: pointer;
-  transition: background-color var(--motion-fast) var(--ease-out);
-}
-
-.switch::after {
-  content: "";
-  position: absolute;
-  inset-block-start: 2px;
-  inset-inline-start: 2px;
-  inline-size: 16px;
-  block-size: 16px;
-  border-radius: 50%;
-  background: var(--color-text);
-  transition: translate var(--motion-fast) var(--ease-out);
-}
-
-.switch[aria-checked="true"] {
-  background: var(--color-soft-mint);
-}
-
-.switch[aria-checked="true"]::after {
-  translate: 14px 0;
-  background: #10201a;
-}
-
-.visually-hidden {
-  position: absolute;
-  inline-size: 1px;
-  block-size: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
-
-.empty {
-  display: grid;
-  justify-items: center;
-  gap: 6px;
-  padding: 24px 16px;
-  text-align: center;
-}
-
-.empty h2 {
-  margin: 0;
-  font-size: var(--text-body);
-  font-weight: 600;
-}
-
-.empty p {
-  margin: 0;
-  color: var(--color-muted);
-  font-size: var(--text-label);
+  --shadow-float: 0 18px 44px rgb(17 17 27 / 0.6), 0 2px 10px rgb(17 17 27 / 0.4);
+  --color-menu: #313244;
+  --color-menu-separator: rgb(205 214 244 / 0.12);
 }

@@ -5,24 +5,22 @@
     <title>FoFlow</title>
     <link rel="icon" href="../../../assets/icons/32.png" />
     <link rel="stylesheet" href="../../styles/tokens.css" />
+    <link rel="stylesheet" href="../../styles/ui.css" />
     <link rel="stylesheet" href="popup.css" />
+    <script src="../../ui/theme-boot.js"></script>
   </head>
   <body>
     <div class="popup">
-      <div class="head">
-        <span class="title">Time</span>
-        <div class="head-actions">
-          <button type="button" class="icon-button" id="open-page" aria-label="Open Time page">
-            <span id="open-glyph" aria-hidden="true"></span>
-          </button>
-          <button type="button" class="icon-button" id="settings" aria-label="Settings">
-            <span id="settings-glyph" aria-hidden="true"></span>
-          </button>
-        </div>
-      </div>
+      <header class="head">
+        <span class="brand">FoFlow</span>
+        <div class="head-actions" id="head-actions"></div>
+      </header>
       <div id="focus"></div>
-      <div id="stats"></div>
-      <div id="sites"></div>
+      <div id="stats" class="stats"></div>
+      <section class="sites-card">
+        <h3 class="section-title" id="sites-title">Sites</h3>
+        <div id="sites"></div>
+      </section>
       <p class="local" id="local"></p>
     </div>
     <script type="module" src="popup.js"></script>

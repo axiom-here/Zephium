@@ -11,7 +11,7 @@ export function ring({ value, size = 148, stroke = 8, tone = "lead", label, cent
   const dial = el(
     "div",
     {
-      class: `dial ${tone === "rest" ? "rest" : ""}`,
+      class: `ring ${tone === "rest" ? "rest" : ""}`,
       style: { inlineSize: `${size}px`, blockSize: `${size}px` },
       role: label ? "progressbar" : null,
       "aria-label": label ?? null,

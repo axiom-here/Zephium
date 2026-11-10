@@ -2,7 +2,8 @@
 // Everything deeper lives on the Time page, one click away.
 import { focusCard } from "../../ui/focus-card.js";
 import { siteList } from "../../ui/sites.js";
-import { glyphs, el, fill } from "../../ui/dom.js";
+import { el, fill, glyphs, iconButton } from "../../ui/dom.js";
+import { themeButton } from "../../ui/theme.js";
 import { m } from "../../lib/messages.js";
 import { duration } from "../../lib/time.js";
 
@@ -18,16 +19,21 @@ let snapshot = null;
 let report = null;
 let focusDays = [];
 
-document.getElementById("open-glyph").append(glyphs.clock(15));
-document.getElementById("settings-glyph").append(glyphs.settings(15));
-document.getElementById("open-page").addEventListener("click", async () => {
-  await send({ type: "time:open" });
-  window.close();
-});
-document.getElementById("settings").addEventListener("click", () => {
-  chrome.runtime.openOptionsPage();
-  window.close();
-});
+// The header carries the same two controls on every surface: the theme, and
+// the way to the bigger one. Settings lives on the Time page's toolbar.
+document.getElementById("head-actions").append(
+  themeButton(),
+  iconButton(m("open_time"), glyphs.expand, {
+    onclick: async () => {
+      await send({ type: "time:open" });
+      window.close();
+    },
+  }),
+);
+document.querySelector("#head-actions .icon-button:last-child").setAttribute(
+  "title",
+  m("open_time"),
+);
 
 const card = focusCard({
   snapshot: () => snapshot ?? empty(),
@@ -50,6 +56,7 @@ document.getElementById("focus").append(card.root);
 
 const sites = siteList({ sites: [], total: 0, size: "panel" });
 document.getElementById("sites").append(sites.root);
+document.getElementById("sites-title").textContent = m("time_sites");
 
 function empty() {
   return {
@@ -82,10 +89,9 @@ async function refresh() {
 
 function draw() {
   const total = report?.total ?? 0;
-  const stats = document.getElementById("stats");
   const day = focusDays[0] ?? { seconds: 0, sessions: 0, completed: 0 };
-  fill(stats);
-  stats.append(
+  fill(document.getElementById("stats"));
+  document.getElementById("stats").append(
     el(
       "div",
       { class: "stat" },
@@ -100,13 +106,12 @@ function draw() {
       el("span", { class: "label", text: m("focus_focused") }),
     ),
   );
-  fill(document.getElementById("sites"));
-  document.getElementById("sites").append(
-    el("h3", { class: "section-title", text: m("time_sites") }),
-  );
   sites.update((report?.sites ?? []).slice(0, 4));
-  document.getElementById("sites").append(sites.root);
-  fill(document.getElementById("local"), glyphs.lock(11), el("span", { text: m("time_local_only") }));
+  fill(
+    document.getElementById("local"),
+    glyphs.lock(11),
+    el("span", { text: m("time_local_only") }),
+  );
   card.draw();
 }
 

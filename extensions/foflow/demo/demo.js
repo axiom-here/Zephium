@@ -121,8 +121,37 @@ globalThis.chrome = {
       setTimeout(() => callback?.(reply(message)), 0);
     },
   },
+  storage: {
+    // The theme is remembered between previews, as it is in the extension.
+    local: {
+      get: async (key) => {
+        const value = globalThis.localStorage?.getItem(`foflow-preview-${key}`);
+        return value === null || value === undefined ? {} : { [key]: value };
+      },
+      set: async (values) => {
+        for (const [key, value] of Object.entries(values)) {
+          globalThis.localStorage?.setItem(`foflow-preview-${key}`, value);
+        }
+      },
+    },
+    session: { get: async () => ({}), set: async () => {} },
+    onChanged: { addListener() {}, removeListener() {} },
+  },
   tabs: { create: async ({ url }) => globalThis.window.open(url, "_blank", "noopener") },
 };
+
+// The preview has no browser to open settings for, so the one button that
+// would leave the page cycles the theme instead: the three themes are the
+// point of the preview as much as the layout is.
+const { THEMES, applyStoredTheme, setTheme } = await import("../src/ui/theme.js");
+await applyStoredTheme();
+document.getElementById("cycle-theme")?.addEventListener("click", async () => {
+  const order = THEMES.map((entry) => entry.id);
+  const current = document.documentElement.dataset.themeChoice ?? "system";
+  const next = order[(order.indexOf(current) + 1) % order.length];
+  await setTheme(next);
+  document.getElementById("cycle-theme").textContent = `Theme: ${THEMES.find((entry) => entry.id === next).label}`;
+});
 
 document.getElementById("span")?.setAttribute("data-preview", "true");
 await import("../src/pages/time/time.js");

@@ -66,6 +66,7 @@ export const M = {
   focus_cover_left: "left in this round",
   focus_done_title: "Focus complete",
   focus_break_title: "Time for a break",
+  back: "Back",
   focus_back_title: "Back to focus",
 
   settings: "Settings",
@@ -85,6 +86,9 @@ export const M = {
   pref_notifications: "Tell me when a phase ends",
   pref_notifications_help: "Uses the browser's own notifications.",
   pref_clear: "Delete counted time",
+  pref_clear_help: "Sites and focus rounds are kept; counted time is not.",
+  open_time: "Open the Time page",
+  theme: "Theme",
 };
 
 /** `focus_minutes({ minutes: 25 })` → "25 min". */

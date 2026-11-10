@@ -3,8 +3,14 @@
   "private": true,
   "type": "module",
   "version": "1.0.0",
-  "description": "The Zephium browser's Focus and Time surfaces, as a Chromium extension.",
+  "description": "Focus rounds, shut sites, and time on the web. A Chromium extension.",
   "scripts": {
-    "test": "node --test test/run.mjs test/package.mjs"
+    "test": "node --test test/run.mjs test/package.mjs",
+    "test:dom": "node --test-force-exit --test test/browser.mjs test/ui.mjs",
+    "test:all": "npm test && npm run test:dom",
+    "preview": "node scripts/serve.mjs"
+  },
+  "devDependencies": {
+    "jsdom": "^31.0.0"
   }
 }

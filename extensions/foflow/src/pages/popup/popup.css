@@ -1,13 +1,15 @@
-/* The toolbar popup: the sidebar's Time panel, 320px wide. */
+/* The toolbar popup: the sidebar's Time panel at 340px. Everything component-
+   shaped comes from ui.css; this file sets the width and the stacking. */
+
 body {
-  inline-size: 320px;
+  inline-size: 340px;
   background: var(--color-chrome);
 }
 
 .popup {
   display: grid;
   gap: 10px;
-  padding: 10px;
+  padding: 12px;
 }
 
 .head {
@@ -17,43 +19,294 @@ body {
   padding: 0 2px 2px;
 }
 
-.head .title {
+.head .brand {
   font-size: var(--text-page-title);
   font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .head-actions {
   display: flex;
+  align-items: center;
   gap: 2px;
   margin-inline-start: auto;
 }
 
-.icon-button {
-  width: 24px;
-  height: 24px;
+.sites-card {
+  display: grid;
+  gap: 2px;
+  padding: 10px 6px 6px;
+  border-radius: var(--radius-card);
+  background: var(--color-card);
+  box-shadow: var(--row-rim);
 }
 
-/* The card in the popup is the same card, a step tighter. */
+.section-title {
+  margin: 0 6px 4px;
+  color: var(--color-faint);
+  font-size: var(--text-caption);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.local {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  margin: 0;
+  color: var(--color-faint);
+  font-size: var(--text-caption);
+}
+
+/* The focus card in the popup is the same card, a step tighter. */
 .focus {
+  display: grid;
+  gap: 12px;
   padding: 14px;
+}
+
+.focus .body {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.focus .dial {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+}
+
+.focus .dial .ring {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+}
+
+.focus .dial svg {
+  position: absolute;
+  inset: 0;
+  rotate: -90deg;
+}
+
+.focus .dial .track {
+  fill: none;
+  stroke: var(--color-track);
+}
+
+.focus .dial .arc {
+  fill: none;
+  stroke: var(--color-text);
+  stroke-linecap: round;
+  transition:
+    stroke-dashoffset 1s linear,
+    stroke var(--motion-slow) var(--ease-out);
+}
+
+.focus .dial.rest .arc {
+  stroke: var(--color-accent);
+}
+
+.focus .ring .center {
+  position: relative;
+  display: grid;
+  place-items: center;
+  text-align: center;
+}
+
+.focus .focus-length {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  display: grid;
+  justify-items: center;
+  gap: 0;
+  padding: 6px 9px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  cursor: pointer;
+  translate: -50% -50%;
+  transition: background-color var(--motion-fast) var(--ease-out);
+}
+
+.focus .focus-length:hover,
+.focus .focus-length[aria-expanded="true"] {
+  background: var(--color-fill-hover);
 }
 
 .focus .length {
   font-size: 30px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.focus .unit {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--color-muted);
+  font-size: var(--text-caption);
 }
 
 .focus .clock {
-  font-size: 24px;
+  font-size: 22px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.focus .facts {
+  display: grid;
+  gap: 3px;
+  justify-items: start;
+  min-width: 0;
 }
 
 .focus .facts h3 {
+  margin: 0;
   font-size: var(--text-page-title);
+  font-weight: 600;
 }
 
-.length-menu {
-  min-inline-size: 160px;
+.focus .detail {
+  color: var(--color-muted);
+  font-size: var(--text-label);
+  font-variant-numeric: tabular-nums;
 }
 
+.focus .shut {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-muted);
+  font: inherit;
+  font-size: var(--text-label);
+  text-align: start;
+  cursor: pointer;
+}
+
+.focus .shut:hover {
+  color: var(--color-text);
+}
+
+.focus .actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-block-start: 9px;
+}
+
+.focus .failed {
+  margin: 0;
+  color: var(--color-danger);
+  font-size: var(--text-label);
+}
+
+.focus .editor {
+  padding-block-start: 12px;
+  border-block-start: 1px solid var(--color-border);
+}
+
+.focus .editor-inner {
+  display: grid;
+  gap: 10px;
+}
+
+.focus .editor h4 {
+  margin: 0;
+  font-size: var(--text-label);
+  font-weight: 600;
+}
+
+/* The editor is the one from the Time page, laid out for a narrow column. */
+.shut-editor {
+  display: grid;
+  gap: 10px;
+}
+
+.shut-editor .add {
+  display: flex;
+  gap: 6px;
+}
+
+.shut-editor .add-button {
+  padding-inline: 9px 10px;
+  border-radius: var(--radius-field);
+}
+
+.shut-editor .invalid {
+  margin: -4px 0 0;
+  color: var(--color-danger);
+  font-size: var(--text-label);
+}
+
+.shut-editor .suggested {
+  display: grid;
+  gap: 6px;
+}
+
+.shut-editor .suggested .chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.shut-editor .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 7px 4px 5px;
+  border: 0;
+  border-radius: var(--radius-capsule);
+  background: var(--color-fill);
+  color: var(--color-label-secondary);
+  font-size: var(--text-caption);
+  cursor: pointer;
+}
+
+.shut-editor .chip:hover {
+  background: var(--color-fill-hover);
+  color: var(--color-text);
+}
+
+.shut-editor .shut-list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.shut-editor .shut-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-block-size: 30px;
+  padding-inline: 4px 2px;
+  border-radius: var(--radius-row);
+}
+
+.shut-editor .shut-list .name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: var(--text-label);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.shut-editor .shut-list .none-row {
+  color: var(--color-muted);
+  font-size: var(--text-label);
+}
+
+/* Today's two figures, side by side. */
 .stats {
   display: flex;
   align-items: center;
@@ -66,8 +319,8 @@ body {
 
 .stats .stat {
   display: grid;
-  gap: 1px;
   flex: 1;
+  gap: 1px;
 }
 
 .stats .value {
@@ -84,22 +337,8 @@ body {
 
 .stats .divider {
   inline-size: 1px;
-  block-size: 22px;
+  block-size: 24px;
   background: var(--color-border);
-}
-
-.section-title {
-  margin: 2px 2px 4px;
-  color: var(--color-faint);
-  font-size: var(--text-caption);
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-#sites {
-  display: grid;
-  gap: 2px;
 }
 
 .sites {
@@ -108,14 +347,14 @@ body {
   list-style: none;
 }
 
-.row {
+.sites .row {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   grid-template-rows: auto auto;
   align-items: center;
   gap: 5px 8px;
   inline-size: 100%;
-  padding: 6px 8px 7px;
+  padding: 7px 8px 8px;
   border: 0;
   border-radius: var(--radius-row);
   background: transparent;
@@ -125,11 +364,11 @@ body {
   cursor: pointer;
 }
 
-.row:hover {
+.sites .row:hover {
   background: var(--row-hover);
 }
 
-.row .name {
+.sites .row .name {
   grid-column: 2;
   overflow: hidden;
   font-size: var(--text-label);
@@ -137,13 +376,13 @@ body {
   white-space: nowrap;
 }
 
-.row .spent {
+.sites .row .spent {
   color: var(--color-muted);
   font-size: var(--text-caption);
   font-variant-numeric: tabular-nums;
 }
 
-.row .meter {
+.sites .row .meter {
   grid-column: 2 / -1;
   block-size: 2px;
   border-radius: var(--radius-capsule);
@@ -151,7 +390,7 @@ body {
   overflow: hidden;
 }
 
-.row .fill {
+.sites .row .fill {
   display: block;
   block-size: 100%;
   background: color-mix(in srgb, var(--color-text) 42%, transparent);
@@ -159,39 +398,17 @@ body {
 }
 
 .sites .none {
-  padding: 6px 8px;
-  color: var(--color-muted);
-  font-size: var(--text-label);
+  padding: 4px 8px 8px;
 }
 
 .sites .none .empty {
-  padding: 4px 0;
+  padding: 0;
   justify-items: start;
   text-align: start;
 }
 
-.local {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  margin: 2px 0 0;
-  color: var(--color-faint);
-  font-size: var(--text-caption);
-}
-
-.favicon {
-  display: block;
-  flex: none;
-  border-radius: 4px;
-  object-fit: contain;
-}
-
-.favicon.letter {
-  display: grid;
-  place-items: center;
-  background: var(--color-fill);
-  color: var(--color-muted);
-  font-weight: 600;
-  line-height: 1;
+/* A popup is short; the menu must never be cut off by its own body. */
+.menu {
+  max-block-size: 320px;
+  overflow-y: auto;
 }

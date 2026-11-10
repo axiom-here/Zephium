@@ -3,10 +3,10 @@
 // rebuilt against the extension's storage.
 import { bars } from "../../ui/bars.js";
 import { focusCard, shutEditor } from "../../ui/focus-card.js";
-import { siteList } from "../../ui/sites.js";
-import { el, fill, glyphs } from "../../ui/dom.js";
+import { siteList, siteMark } from "../../ui/sites.js";
+import { el, fill, glyphs, iconButton } from "../../ui/dom.js";
+import { themeButton } from "../../ui/theme.js";
 import { m } from "../../lib/messages.js";
-import { siteMark } from "../../ui/sites.js";
 import {
   currentPeriod,
   dayLabel,
@@ -31,7 +31,6 @@ const state = {
   span: new URLSearchParams(location.search).get("span") === "week" ? "week" : "day",
   period: null,
   report: null,
-  overview: null,
   focusDays: [],
   site: null,
   pointed: null,
@@ -42,20 +41,36 @@ const $ = (id) => document.getElementById(id);
 
 // ------------------------------------------------------------------- chrome
 
-const back = $("back");
-back.querySelector(".arrow").append(glyphs.arrowLeft(15));
-back.append(el("span", { class: "label", text: m("time_title") }));
-back.addEventListener("click", () => {
-  // Opened from the toolbar, so the browser's own history decides where back is.
-  if (history.length > 1) history.back();
-  else window.close();
-});
+function bootToolbar() {
+  const back = $("back");
+  back.querySelector(".arrow").append(glyphs.arrowLeft(15));
+  back.setAttribute("aria-label", m("back"));
+  back.setAttribute("title", m("back"));
+  $("toolbar-title").textContent = m("time_title");
+  back.addEventListener("click", () => {
+    // Opened from the toolbar or a first run, so the browser's own history
+    // decides where back is; a tab with none closes instead.
+    if (history.length > 1) history.back();
+    else if (opener) window.close();
+    else void send({ type: "time:open", span: "day" });
+  });
 
-$("settings-open").querySelector(".glyph").append(glyphs.settings(15));
-$("settings-open").addEventListener("click", () => {
-  chrome.runtime.openOptionsPage();
-});
+  // The theme choice and settings sit at the trailing edge of the toolbar, so
+  // settings is always one click away and always one click back.
+  const end = $("toolbar-end");
+  end.append(
+    themeButton(),
+    iconButton(m("settings"), glyphs.settings, {
+      onclick: () => chrome.runtime.openOptionsPage(),
+    }),
+  );
+  end.querySelector(".icon-button:last-child").setAttribute(
+    "title",
+    `${m("settings_open")} · Ctrl+,`,
+  );
+}
 
+$("settings-open")?.remove();
 for (const node of $("span").querySelectorAll("button")) {
   node.textContent = node.dataset.span === "day" ? m("time_span_day") : m("time_span_week");
   node.addEventListener("click", () => show(node.dataset.span));
@@ -64,6 +79,7 @@ $("previous").append(glyphs.chevronLeft(15));
 $("next").append(glyphs.chevronRight(15));
 $("previous").addEventListener("click", () => shift(-1));
 $("next").addEventListener("click", () => shift(1));
+$("today").textContent = m("time_go_today");
 $("today").addEventListener("click", () => {
   state.period = currentPeriod(state.period.span);
   state.site = null;
@@ -73,9 +89,8 @@ $("crumb").append(glyphs.arrowLeft(13), m("time_all_sites"));
 $("crumb").addEventListener("click", () => select(null));
 $("shut-card").querySelector(".help").textContent = m("focus_shut_help");
 $("shut-card").querySelector("h3").textContent = m("focus_shut_title");
-$("shut-card").querySelector(".lock")?.append(glyphs.lock(11));
-document.querySelector(".local").lastChild.textContent = m("time_local_only");
-document.querySelector(".local .lock").append(glyphs.lock(11));
+fill($("local"), glyphs.lock(11), el("span", { text: m("time_local_only") }));
+bootToolbar();
 
 function show(span) {
   if (span === state.period.span) return;
@@ -105,9 +120,7 @@ const focus = focusCard({
   update: async (patch) => {
     const reply = await send({ type: "focus:settings", ...patch });
     if (reply?.snapshot) state.snapshot = reply.snapshot;
-    if (reply?.settings) state.snapshot = { ...(state.snapshot ?? {}), ...reply.settings };
     await refresh();
-    draw();
     return reply;
   },
   actions: {
@@ -118,13 +131,12 @@ const focus = focusCard({
   },
   size: "page",
   onmanage: () => {
-    $("shut-card").scrollIntoView({ behavior: "smooth", block: "start" });
-    $("shut-card").classList.add("flash");
-    setTimeout(() => $("shut-card").classList.remove("flash"), 900);
+    const card = $("shut-card");
+    card.scrollIntoView({ behavior: "smooth", block: "start" });
+    card.classList.add("flash");
+    setTimeout(() => card.classList.remove("flash"), 900);
   },
-  onchange: () => {
-    void refresh();
-  },
+  onchange: () => void refresh(),
 });
 $("focus").append(focus.root);
 
@@ -134,14 +146,11 @@ const editor = shutEditor({
     const reply = await send({ type: "focus:settings", ...patch });
     if (reply?.snapshot) state.snapshot = reply.snapshot;
     await refresh();
-    draw();
     return reply;
   },
-  onchange: () => {
-    void refresh();
-  },
+  onchange: () => void refresh(),
 });
-$("shut-editor").append(editor);
+$("shut-editor").append(editor.root);
 
 function emptySnapshot() {
   return {
@@ -159,7 +168,6 @@ async function after(reply) {
   const snapshot = await send({ type: "focus:snapshot" });
   if (snapshot) state.snapshot = snapshot;
   await refresh();
-  draw();
   return reply;
 }
 
@@ -193,14 +201,11 @@ async function refresh() {
 
 const STEADY_SECONDS = 5 * 60;
 
-function totals(buckets) {
-  return buckets.reduce((sum, value) => sum + value, 0);
-}
+const totals = (buckets) => buckets.reduce((sum, value) => sum + value, 0);
 
 function elapsedBuckets(period, now = new Date()) {
   const live = liveBucket(period, now);
-  if (live >= 0) return live + 1;
-  return 0;
+  return live >= 0 ? live + 1 : 0;
 }
 
 function comparison(period, current, previous) {
@@ -238,17 +243,14 @@ function draw() {
   for (const node of $("span").querySelectorAll("button")) {
     const active = node.dataset.span === period.span;
     node.setAttribute("aria-pressed", String(active));
-    node.classList.toggle("active", active);
   }
   $("period-label").textContent = periodLabel(period);
   $("previous").setAttribute(
     "aria-label",
     period.span === "day" ? m("time_previous_day") : m("time_previous_week"),
   );
-  $("next").setAttribute(
-    "aria-label",
-    period.span === "day" ? m("time_next_day") : m("time_next_week"),
-  );
+  $("next").setAttribute("aria-label", period.span === "day" ? m("time_next_day") : m("time_next_week"));
+  $("next").disabled = period.start >= currentPeriod(period.span).start;
   $("today").hidden = period.start >= currentPeriod(period.span).start;
 
   $("site-head").hidden = site === null;
@@ -259,11 +261,9 @@ function draw() {
   $("total").textContent = duration(sum);
   $("sub").textContent = site !== null ? m("time_site_total", { site }) : m("time_on_web");
 
-  const change =
-    site === null && report
-      ? comparison(period, sum, report.previous ?? 0)
-      : null;
-  const average = site === null && period.span === "week" ? sum / Math.max(1, elapsedBuckets(period)) : null;
+  const change = site === null && report ? comparison(period, sum, report.previous ?? 0) : null;
+  const average =
+    site === null && period.span === "week" ? sum / Math.max(1, elapsedBuckets(period)) : null;
   const changeNode = $("change");
   if (change !== null && Math.abs(change) >= STEADY_SECONDS) {
     changeNode.textContent =
@@ -306,16 +306,10 @@ function drawChart() {
   const buckets = report?.buckets ?? new Array(period.span === "day" ? 24 : 7).fill(0);
   const values = [...buckets];
   const pointed = state.pointed;
-  const highlight =
-    pointed === null
-      ? null
-      : (report?.sites.find((entry) => entry.site === pointed)?.series?.length
-          ? report.sites.find((entry) => entry.site === pointed).series
-          : null);
+  const entry = pointed === null ? null : report?.sites.find((row) => row.site === pointed);
+  const highlight = entry?.series?.length ? entry.series : null;
   const average =
-    period.span === "week"
-      ? totals(buckets) / Math.max(1, elapsedBuckets(period))
-      : null;
+    period.span === "week" ? totals(buckets) / Math.max(1, elapsedBuckets(period)) : null;
   const ticks =
     period.span === "day"
       ? [0, 3, 6, 9, 12, 15, 18, 21].map((index) => ({ index, label: hourLabel(index) }))
@@ -370,9 +364,7 @@ function drawSiteActions() {
       {
         type: "button",
         class: "button",
-        onclick: () => {
-          void chrome.tabs.create({ url: `https://${site}/` });
-        },
+        onclick: () => void chrome.tabs.create({ url: `https://${site}/` }),
       },
       m("time_open_site", { site }),
     ),
@@ -402,11 +394,7 @@ function periodLabel(period) {
   if (period.span === "day") {
     return back === 0 ? m("time_today") : back === 1 ? m("time_yesterday") : dayLabel(period.start);
   }
-  return back === 0
-    ? m("time_this_week")
-    : back === 1
-      ? m("time_last_week")
-      : weekLabel(period.start);
+  return back === 0 ? m("time_this_week") : back === 1 ? m("time_last_week") : weekLabel(period.start);
 }
 
 function periodIsCurrent() {
@@ -421,6 +409,14 @@ chrome.runtime.onMessage.addListener((message) => {
   draw();
 });
 
+// Settings is one keystroke away, as in the browser.
+document.addEventListener("keydown", (event) => {
+  if ((event.metaKey || event.ctrlKey) && event.key === ",") {
+    event.preventDefault();
+    chrome.runtime.openOptionsPage();
+  }
+});
+
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "visible") void refresh();
 });
@@ -429,7 +425,6 @@ setInterval(() => {
 }, 60_000);
 
 void refresh().then(async () => {
-  // The first draw needs the snapshot the report did not carry.
   state.snapshot = await send({ type: "focus:snapshot" });
   draw();
 });

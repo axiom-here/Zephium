@@ -1,5 +1,6 @@
 /* The Time page, measured off the browser's own: a 1080px column, the chart
-   and sites on the left, focus and its shut sites on the right. */
+   and sites on the left, focus and its shut sites on the right. Shared
+   components come from ui.css; this file only lays them out. */
 
 body {
   min-block-size: 100vh;
@@ -9,37 +10,53 @@ body {
 .toolbar {
   position: sticky;
   inset-block-start: 0;
-  z-index: 2;
+  z-index: 5;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   padding: 10px clamp(16px, 4vw, 48px);
-  background: color-mix(in srgb, var(--color-page) 86%, transparent);
+  background: color-mix(in srgb, var(--color-page) 88%, transparent);
   backdrop-filter: blur(18px);
 }
 
-.toolbar .back {
+.back {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  inline-size: auto;
-  padding-inline: 6px 10px;
+  gap: 7px;
+  padding: 4px 10px 4px 5px;
+  border: 0;
+  border-radius: var(--radius-capsule);
+  background: transparent;
   color: var(--color-muted);
   font-size: var(--text-body);
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color var(--motion-fast) var(--ease-out),
+    color var(--motion-fast) var(--ease-out);
 }
 
-.toolbar .back .label {
-  margin-block-start: 1px;
+.back:hover {
+  background: var(--color-fill);
+  color: var(--color-text);
 }
 
-.toolbar h1 {
-  margin: 0;
-  font-size: var(--text-page-title);
-  font-weight: 600;
-  letter-spacing: -0.01em;
+.back .arrow {
+  display: inline-flex;
+}
+
+/* The Time page is the deepest surface, so its toolbar names the page rather
+   than the destination, the way a browser's own pages do. */
+.toolbar-title {
+  color: var(--color-muted);
+  font-size: var(--text-body);
+  font-weight: 500;
 }
 
 .toolbar-end {
+  display: flex;
+  align-items: center;
+  gap: 2px;
   margin-inline-start: auto;
 }
 
@@ -62,35 +79,24 @@ body {
   min-block-size: 30px;
 }
 
-.segmented button.active {
-  background: var(--color-control);
-  box-shadow: var(--row-rim);
-  color: var(--color-text);
-}
-
 .stepper {
   display: flex;
   align-items: center;
   gap: 2px;
-  margin-inline: 10px;
+  margin-inline: 8px;
 }
 
 .stepper .period {
-  min-inline-size: 84px;
+  min-inline-size: 88px;
   color: var(--color-text);
   font-size: var(--text-body);
   font-weight: 500;
   text-align: center;
 }
 
-.stepper #next:disabled {
-  opacity: 0.35;
-  cursor: default;
-}
-
 .layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 316px;
+  grid-template-columns: minmax(0, 1fr) 320px;
   align-items: start;
   gap: 16px;
 }
@@ -207,7 +213,7 @@ body {
 }
 
 .bars.axis {
-  --axis-room: 40px;
+  --axis-room: 44px;
 }
 
 .plot {
@@ -332,7 +338,7 @@ body {
   padding: 5px 8px;
   border-radius: var(--radius-control-compact);
   background: var(--color-surface);
-  box-shadow: var(--row-rim);
+  box-shadow: var(--row-rim), var(--shadow-float);
   translate: -50% 0;
   pointer-events: none;
   white-space: nowrap;
@@ -485,24 +491,6 @@ body {
   }
 }
 
-/* ---------------------------------------------------------------- favicons */
-
-.favicon {
-  display: block;
-  flex: none;
-  border-radius: 4px;
-  object-fit: contain;
-}
-
-.favicon.letter {
-  display: grid;
-  place-items: center;
-  background: var(--color-fill);
-  color: var(--color-muted);
-  font-weight: 600;
-  line-height: 1;
-}
-
 /* ------------------------------------------------------------------- focus */
 
 .focus {
@@ -521,6 +509,13 @@ body {
   position: relative;
   display: grid;
   flex: none;
+  place-items: center;
+}
+
+/* The ring is drawn by its own svg, so the circle is never a filled disc. */
+.focus .dial .ring {
+  position: relative;
+  display: inline-grid;
   place-items: center;
 }
 
@@ -545,12 +540,13 @@ body {
 }
 
 .focus .dial.rest .arc {
-  stroke: var(--color-soft-mint);
+  stroke: var(--color-accent);
 }
 
-.focus .center {
+.focus .ring .center {
   position: relative;
   display: grid;
+  gap: 1px;
   place-items: center;
   text-align: center;
 }
@@ -561,13 +557,13 @@ body {
   display: grid;
   justify-items: center;
   gap: 0;
-  padding: 6px 10px;
+  padding: 8px 12px;
   border: 0;
   border-radius: var(--radius-control);
   background: transparent;
   color: var(--color-text);
   font: inherit;
-  cursor: default;
+  cursor: pointer;
   translate: -50% -50%;
   transition: background-color var(--motion-fast) var(--ease-out);
 }
@@ -658,66 +654,20 @@ body {
   font-size: var(--text-label);
 }
 
-.focus .failed[hidden] {
-  display: none;
+.focus .editor {
+  padding-block-start: 12px;
+  border-block-start: 1px solid var(--color-border);
 }
 
-/* The length menu, drawn where the browser draws its own. */
-.length-menu {
-  position: absolute;
-  inset-block-start: calc(100% + 6px);
-  inset-inline-start: 50%;
+.focus .editor-inner {
   display: grid;
-  min-inline-size: 168px;
-  padding: 6px;
-  border-radius: var(--radius-control);
-  background: var(--color-surface);
-  box-shadow:
-    var(--row-rim),
-    0 18px 40px rgb(0 0 0 / 0.35);
-  translate: -50% 0;
-  z-index: 5;
+  gap: 10px;
 }
 
-.length-menu button {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-block-size: 30px;
-  padding-inline: 10px;
-  border: 0;
-  border-radius: var(--radius-control-compact);
-  background: none;
-  color: var(--color-text);
+.focus .editor h4 {
+  margin: 0;
   font-size: var(--text-label);
-  text-align: start;
-  cursor: pointer;
-}
-
-.length-menu button:hover {
-  background: var(--color-fill);
-}
-
-.length-menu button.chosen::before {
-  content: "";
-  inline-size: 6px;
-  block-size: 6px;
-  border-radius: 50%;
-  background: var(--color-soft-mint);
-  margin-inline-start: -2px;
-}
-
-.length-menu button:not(.chosen)::before {
-  content: "";
-  inline-size: 6px;
-  block-size: 6px;
-  margin-inline-start: -2px;
-}
-
-.length-menu .separator {
-  block-size: 1px;
-  margin: 4px 8px;
-  background: var(--color-border);
+  font-weight: 600;
 }
 
 /* ------------------------------------------------------------- focus stats */
@@ -767,32 +717,15 @@ body {
   gap: 6px;
 }
 
-.shut-editor .submit {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
+.shut-editor .add-button {
   padding-inline: 10px 12px;
-  border: 0;
   border-radius: var(--radius-field);
-  background: var(--color-control);
-  color: var(--color-on-control);
-  font-size: var(--text-label);
-  font-weight: 500;
-  cursor: pointer;
-}
-
-.shut-editor .submit:hover {
-  background: var(--color-control-hover);
 }
 
 .shut-editor .invalid {
   margin: -6px 0 0;
   color: var(--color-danger);
   font-size: var(--text-label);
-}
-
-.shut-editor .invalid[hidden] {
-  display: none;
 }
 
 .shut-editor .suggested {
@@ -872,26 +805,4 @@ body {
   margin: 0;
   color: var(--color-faint);
   font-size: var(--text-caption);
-}
-
-.local .lock {
-  display: inline-flex;
-}
-
-/* ------------------------------------------------------------------ editor */
-
-.focus .editor {
-  padding-block-start: 12px;
-  border-block-start: 1px solid var(--color-border);
-}
-
-.focus .editor-inner {
-  display: grid;
-  gap: 10px;
-}
-
-.focus .editor h4 {
-  margin: 0;
-  font-size: var(--text-label);
-  font-weight: 600;
 }

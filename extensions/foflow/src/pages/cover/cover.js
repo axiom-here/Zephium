@@ -1,8 +1,8 @@
 // Stands where a shut page would be while a focus round runs. The page itself
 // is off the stage; this says why, how long, and offers the two honest ways out.
-import { button, el, fill } from "../../ui/dom.js";
+import { button, el, faviconMark, fill } from "../../ui/dom.js";
 import { ring } from "../../ui/ring.js";
-import { siteMark } from "../../ui/sites.js";
+import { themeButton } from "../../ui/theme.js";
 import { m } from "../../lib/messages.js";
 import { countdown } from "../../lib/time.js";
 import { remaining } from "../../lib/focus.js";
@@ -19,11 +19,13 @@ const send = (message) =>
   });
 
 let snapshot = null;
+let original = null;
 let now = Date.now();
 let confirming = false;
 let busy = false;
 
 document.title = `${site} — ${m("focus_cover_title")}`;
+document.body.append(themeButton());
 
 function draw() {
   const session = snapshot?.session ?? null;
@@ -47,65 +49,72 @@ function draw() {
     return;
   }
 
-  const actions = el(
-    "div",
-    { class: "actions" },
-    button(m("focus_cover_allow"), {
-      size: "regular",
-      pending: busy,
-      onclick: () => void allow(),
-    }),
-    button(confirming ? m("focus_end_confirm") : m("focus_cover_end"), {
-      size: "regular",
-      variant: confirming ? "danger" : "ghost",
-      onblur: () => {
-        confirming = false;
-        draw();
-      },
-      onclick: () => {
-        if (!confirming) {
-          confirming = true;
-          draw();
-          return;
-        }
-        void end();
-      },
-    }),
-  );
-
+  const length = session.phase_ends_ms - session.phase_started_ms;
+  const left = length > 0 ? 1 - Math.min(1, Math.max(0, (now - session.phase_started_ms) / length)) : 1;
   stage.append(
     el(
       "div",
       { class: "panel" },
-      ring({
-        value:
-          1 -
-          Math.min(
-            1,
-            Math.max(0, (now - session.phase_started_ms) / (session.phase_ends_ms - session.phase_started_ms)),
-          ),
-        size: 176,
-        stroke: 8,
-        tone: session.phase === "focus" ? "lead" : "rest",
-        label: m("focus_cover_left"),
-        center: [
-          el("span", { class: "clock", text: countdown(remaining(session, now)) }),
-          el("span", { class: "left", text: m("focus_cover_left") }),
-        ],
-      }),
-      el("span", { class: "site" }, siteMark(site, 16), el("span", { text: site })),
+      el(
+        "div",
+        { class: "ring-wrap" },
+        ring({
+          value: left,
+          size: 176,
+          stroke: 8,
+          tone: session.phase === "focus" ? "lead" : "rest",
+          label: m("focus_cover_left"),
+          center: [
+            el("span", { class: "clock", text: countdown(remaining(session, now)) }),
+            el("span", { class: "left", text: m("focus_cover_left") }),
+          ],
+        }),
+      ),
+      el("span", { class: "site" }, faviconMark(site, { size: 16 }), el("span", { text: site })),
       el("h1", { id: "title", text: m("focus_cover_title") }),
       el("p", { text: m("focus_cover_body", { site }) }),
-      actions,
+      el(
+        "div",
+        { class: "actions" },
+        button(m("focus_cover_allow"), {
+          size: "regular",
+          variant: "primary",
+          pending: busy,
+          onclick: () => void allow(),
+        }),
+        button(confirming ? m("focus_end_confirm") : m("focus_cover_end"), {
+          size: "regular",
+          variant: confirming ? "danger" : "ghost",
+          onblur: () => {
+            if (!confirming) return;
+            confirming = false;
+            draw();
+          },
+          onclick: (event) => {
+            if (!confirming) {
+              confirming = true;
+              draw();
+              return;
+            }
+            confirming = false;
+            event.currentTarget.blur();
+            void end();
+          },
+        }),
+      ),
     ),
   );
 }
 
+function leave() {
+  location.replace(original ?? `https://${site}/`);
+}
+
 async function refresh() {
   snapshot = await send({ type: "cover:state", site });
+  original = snapshot?.url ?? original;
   if (snapshot?.session === null) {
-    // Nothing holds this page any more; put the reader where they were.
-    location.replace(pendingUrl() ?? `https://${site}/`);
+    leave();
     return;
   }
   draw();
@@ -113,9 +122,10 @@ async function refresh() {
 
 async function start() {
   busy = true;
+  draw();
   await send({ type: "focus:start" });
-  await refresh();
   busy = false;
+  await refresh();
 }
 
 async function allow() {
@@ -124,7 +134,7 @@ async function allow() {
   const reply = await send({ type: "cover:resume", site });
   busy = false;
   if (reply?.ok) {
-    location.replace(reply.url ?? pendingUrl() ?? `https://${site}/`);
+    location.replace(reply.url ?? original ?? `https://${site}/`);
     return;
   }
   draw();
@@ -136,23 +146,17 @@ async function end() {
   await refresh();
 }
 
-let original = null;
-function pendingUrl() {
-  return original;
-}
-
 chrome.runtime.onMessage.addListener((message) => {
   if (message?.type !== "focus:changed") return;
-  const next = message.snapshot;
   const before = snapshot?.session;
-  snapshot = next;
-  if (next?.session === null) {
-    location.replace(pendingUrl() ?? `https://${site}/`);
+  snapshot = message.snapshot;
+  if (snapshot?.session === null) {
+    leave();
     return;
   }
-  // A new phase opens the page again; a break is not a shut round.
-  if (before && next?.session && next.session.phase !== "focus") {
-    location.replace(pendingUrl() ?? `https://${site}/`);
+  // A break is not a shut round, so the page opens again.
+  if (before && snapshot?.session && snapshot.session.phase !== "focus") {
+    leave();
     return;
   }
   draw();
@@ -174,7 +178,7 @@ void (async () => {
   original = snapshot?.url ?? null;
   now = Date.now();
   if (snapshot?.session === null) {
-    location.replace(`https://${site}/`);
+    leave();
     return;
   }
   draw();

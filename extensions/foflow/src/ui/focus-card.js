@@ -2,8 +2,9 @@
 // At rest its centre is the length, which opens the choices; running, it
 // empties toward the end of the phase. The layout stays put between the two,
 // so starting reads as the dial coming alive.
-import { button, el, fill, glyphs, iconButton } from "./dom.js";
+import { button, el, faviconMark, fill, glyphs, iconButton } from "./dom.js";
 import { ring } from "./ring.js";
+import { openMenu } from "./menu.js";
 import { m } from "../lib/messages.js";
 import { countdown, clockLabel } from "../lib/time.js";
 import { remaining } from "../lib/focus.js";
@@ -14,7 +15,7 @@ const LENGTHS = [15, 25, 30, 45, 50, 60, 90];
 /**
  * @param {object} options
  * @param {() => object} options.snapshot  the latest state, read when drawn
- * @param {(patch: object) => Promise<void>} options.update  settings changes
+ * @param {(patch: object) => Promise<object>} options.update  settings changes
  * @param {object} options.actions  focus commands
  * @param {"panel" | "page"} [options.size]
  * @param {boolean} [options.manageInPlace]  whether the shut editor opens here
@@ -34,7 +35,6 @@ export function focusCard({
   let confirming = false;
   let editing = false;
   let busy = false;
-  let opened = false;
   let timer = null;
   /** A command this card sent that the engine refused. The engine's own
    *  failure flag is read too, but a refusal arrives as a reply and would
@@ -59,36 +59,35 @@ export function focusCard({
   };
   document.addEventListener("visibilitychange", pace);
 
+  /** A running phase only updates what changes: the clock and the arc. */
   function drawLive() {
     const snap = snapshot();
     if (snap.session === null) return;
-    const clock = root.querySelector(".clock");
-    const arc = root.querySelector(".dial .arc");
-    const dial = root.querySelector(".dial");
-    if (clock) clock.textContent = countdown(remaining(snap.session, now));
     const length = snap.session.phase_ends_ms - snap.session.phase_started_ms;
-    if (arc && length > 0) {
-      const left = 1 - Math.min(1, Math.max(0, (now - snap.session.phase_started_ms) / length));
+    const left = length > 0 ? 1 - Math.min(1, Math.max(0, (now - snap.session.phase_started_ms) / length)) : 1;
+    const clock = root.querySelector(".clock");
+    if (clock) clock.textContent = countdown(remaining(snap.session, now));
+    const arc = root.querySelector(".dial .arc");
+    if (arc) {
       const radius = Number(arc.getAttribute("r"));
-      const circumference = 2 * Math.PI * radius;
-      arc.setAttribute("stroke-dashoffset", circumference * (1 - left));
-      if (dial) dial.setAttribute("aria-valuenow", String(Math.round(left * 100)));
+      arc.setAttribute("stroke-dashoffset", 2 * Math.PI * radius * (1 - left));
     }
-    const badge = root.querySelector(".left");
-    if (badge) badge.textContent = countdown(remaining(snap.session, now));
+    root.querySelector(".dial")?.setAttribute("aria-valuenow", String(Math.round(left * 100)));
     // A phase that ends while this is open redraws into its next shape.
-    if (now >= snap.session.phase_ends_ms) {
-      void actions.sync().then(onchange);
-    }
+    if (now >= snap.session.phase_ends_ms) void actions.sync().then(onchange);
   }
 
+  const dialSize = () => (size === "page" ? 148 : 112);
+  const dialStroke = () => (size === "page" ? 8 : 6);
+
   async function run(task) {
-    if (busy) return;
+    if (busy) return null;
     busy = true;
     refused = false;
     draw();
+    let result = null;
     try {
-      const result = await task();
+      result = await task();
       refused = Boolean(result && result.ok === false && result.reason !== "running");
     } catch {
       refused = true;
@@ -97,52 +96,41 @@ export function focusCard({
       onchange?.();
       draw();
     }
+    return result;
   }
 
-  function chooseLength(minutes) {
-    opened = false;
-    void run(() => update({ minutes }));
-  }
-
-  function drawChoices(anchor) {
-    root.querySelector(".length-menu")?.remove();
-    if (!opened) return;
+  function openLengths(trigger) {
     const snap = snapshot();
-    const menu = el("div", { class: "length-menu", role: "menu" });
-    for (const length of LENGTHS) {
-      menu.append(
-        el(
-          "button",
-          {
-            type: "button",
-            role: "menuitemradio",
-            "aria-checked": String(length === snap.minutes),
-            class: length === snap.minutes ? "chosen" : null,
-            onclick: () => chooseLength(length),
+    openMenu(trigger, {
+      align: "start",
+      label: m("focus_length"),
+      items: [
+        ...LENGTHS.map((length) => ({
+          id: String(length),
+          label: m("focus_minutes", { minutes: length }),
+          checked: length === snap.minutes,
+          onselect: () => {
+            if (length === snapshot().minutes) return;
+            void run(() => update({ minutes: length }));
           },
-          m("focus_minutes", { minutes: length }),
-        ),
-      );
-    }
-    menu.append(el("div", { class: "separator", role: "separator" }));
-    menu.append(
-      el(
-        "button",
+        })),
+        { kind: "separator" },
         {
-          type: "button",
-          role: "menuitemcheckbox",
-          "aria-checked": String(snap.breaks),
-          class: snap.breaks ? "chosen" : null,
-          onclick: () => {
-            opened = false;
-            void run(() => update({ breaks: !snapshot().breaks }));
-          },
+          id: "breaks",
+          label: m("focus_breaks"),
+          checked: snap.breaks,
+          onselect: () => void run(() => update({ breaks: !snapshot().breaks })),
         },
-        m("focus_breaks"),
-      ),
-    );
-    anchor.append(menu);
-    menu.querySelector("button")?.focus();
+      ],
+    });
+  }
+
+  function manage() {
+    if (onmanage) onmanage();
+    else {
+      editing = !editing;
+      draw();
+    }
   }
 
   function draw() {
@@ -154,160 +142,126 @@ export function focusCard({
     failed.hidden = !(refused || snap.failed === true);
 
     if (session === null) {
-      const dial = snap.minutes;
       const lengthButton = el(
         "button",
         {
           type: "button",
           class: "focus-length",
-          "aria-label": `${m("focus_length")}: ${m("focus_minutes", { minutes: dial })}`,
-          "aria-expanded": String(opened),
+          "aria-label": `${m("focus_length")}: ${m("focus_minutes", { minutes: snap.minutes })}`,
           "aria-haspopup": "menu",
+          "aria-expanded": "false",
           onclick: (event) => {
             event.stopPropagation();
-            opened = !opened;
-            draw();
-            const anchor = root.querySelector(".dial");
-            if (anchor) drawChoices(anchor);
-            if (!opened) anchor?.querySelector(".focus-length")?.focus();
+            openLengths(event.currentTarget);
           },
         },
-        el("span", { class: "length", text: String(dial) }),
-        el("span", { class: "unit" }, "min", glyphs.chevronDown(11)),
+        el("span", { class: "length", text: String(snap.minutes) }),
+        el("span", { class: "unit" }, "min", glyphs.chevronDown(10)),
       );
-      const dialNode = el(
-        "div",
-        { class: "dial" },
-        ring({ value: 0, size: size === "page" ? 148 : 112, stroke: size === "page" ? 8 : 6 }),
-        lengthButton,
+      body.append(
+        el("div", { class: "dial" }, ring({ value: 0, size: dialSize(), stroke: dialStroke() }), lengthButton),
+        el(
+          "div",
+          { class: "facts" },
+          el("h3", { text: m("focus_title") }),
+          el(
+            "button",
+            { type: "button", class: "shut", "aria-expanded": String(editing), onclick: manage },
+            shut.length === 0
+              ? m("focus_none_shut")
+              : shut.length === 1
+                ? m("focus_shut_one")
+                : m("focus_shut_count", { count: shut.length }),
+          ),
+          el(
+            "div",
+            { class: "actions" },
+            button(m("focus_start"), {
+              variant: "primary",
+              size: size === "page" ? "regular" : "compact",
+              pending: busy,
+              onclick: () => run(() => actions.start(snap.minutes, snap.breaks)),
+            }),
+          ),
+        ),
       );
-      const shutLabel =
-        shut.length === 0
-          ? m("focus_none_shut")
-          : shut.length === 1
-            ? m("focus_shut_one")
-            : m("focus_shut_count", { count: shut.length });
+    } else {
+      const resting = session.phase !== "focus";
+      const length = session.phase_ends_ms - session.phase_started_ms;
+      const left = length > 0 ? 1 - Math.min(1, Math.max(0, (now - session.phase_started_ms) / length)) : 1;
+      const phaseLabel =
+        session.phase === "focus"
+          ? m("focus_phase_focus")
+          : session.phase === "break"
+            ? m("focus_phase_break")
+            : m("focus_phase_long_break");
       const facts = el(
         "div",
         { class: "facts" },
-        el("h3", { text: m("focus_title") }),
+        el("h3", { text: phaseLabel }),
         el(
-          "button",
-          {
-            type: "button",
-            class: "shut",
-            onclick: () => {
-              if (onmanage) onmanage();
-              else {
-                editing = !editing;
-                draw();
-              }
-            },
-          },
-          shutLabel,
+          "span",
+          { class: "detail" },
+          `${m("focus_round", { round: session.rounds + (session.phase === "focus" ? 1 : 0) })} · ${m(
+            "focus_until",
+            { time: clockLabel(session.phase_ends_ms) },
+          )}`,
         ),
+        !resting && shut.length > 0
+          ? el(
+              "button",
+              { type: "button", class: "shut", onclick: manage },
+              shut.length === 1 ? m("focus_shut_one") : m("focus_shut_count", { count: shut.length }),
+            )
+          : null,
         el(
           "div",
           { class: "actions" },
-          button(m("focus_start"), {
-            variant: "primary",
-            size: size === "page" ? "regular" : "compact",
-            pending: busy,
-            onclick: () => run(() => actions.start(snap.minutes, snap.breaks)),
+          resting ? button(m("focus_skip_break"), { onclick: () => run(() => actions.skip()) }) : null,
+          button(confirming ? m("focus_end_confirm") : m("focus_end"), {
+            variant: confirming ? "danger" : null,
+            onblur: () => {
+              if (!confirming) return;
+              confirming = false;
+              draw();
+            },
+            onclick: (event) => {
+              if (!confirming) {
+                confirming = true;
+                draw();
+                return;
+              }
+              confirming = false;
+              event.currentTarget.blur();
+              void run(() => actions.stop());
+            },
           }),
         ),
       );
-      body.append(dialNode, facts);
-      return;
+      body.append(
+        el(
+          "div",
+          { class: "dial live" },
+          ring({
+            value: left,
+            size: dialSize(),
+            stroke: dialStroke(),
+            tone: resting ? "rest" : "lead",
+            label: phaseLabel,
+            center: el("span", { class: "clock", text: countdown(remaining(session, now)) }),
+          }),
+        ),
+        facts,
+      );
     }
 
-    const resting = session.phase !== "focus";
-    const phaseLabel =
-      session.phase === "focus"
-        ? m("focus_phase_focus")
-        : session.phase === "break"
-          ? m("focus_phase_break")
-          : m("focus_phase_long_break");
-    const dialNode = el(
-      "div",
-      { class: "dial live" },
-      ring({
-        value:
-          1 -
-          Math.min(
-            1,
-            Math.max(0, (now - session.phase_started_ms) / (session.phase_ends_ms - session.phase_started_ms)),
-          ),
-        size: size === "page" ? 148 : 112,
-        stroke: size === "page" ? 8 : 6,
-        tone: resting ? "rest" : "lead",
-        label: phaseLabel,
-        center: el("span", { class: "clock", text: countdown(remaining(session, now)) }),
-      }),
-    );
-    const facts = el(
-      "div",
-      { class: "facts" },
-      el("h3", { text: phaseLabel }),
-      el(
-        "span",
-        { class: "detail" },
-        `${m("focus_round", {
-          round: session.rounds + (session.phase === "focus" ? 1 : 0),
-        })} · ${m("focus_until", {
-          time: clockLabel(session.phase_ends_ms),
-        })}`,
-      ),
-      !resting && shut.length > 0
-        ? el(
-            "button",
-            {
-              type: "button",
-              class: "shut",
-              onclick: () => {
-                if (onmanage) onmanage();
-                else {
-                  editing = !editing;
-                  draw();
-                }
-              },
-            },
-            shut.length === 1 ? m("focus_shut_one") : m("focus_shut_count", { count: shut.length }),
-          )
-        : null,
-      el(
-        "div",
-        { class: "actions" },
-        resting
-          ? button(m("focus_skip_break"), { onclick: () => run(() => actions.skip()) })
-          : null,
-        button(confirming ? m("focus_end_confirm") : m("focus_end"), {
-          variant: confirming ? "danger" : null,
-          onblur: () => {
-            confirming = false;
-          },
-          onclick: () => {
-            if (!confirming) {
-              confirming = true;
-              draw();
-              return;
-            }
-            confirming = false;
-            void run(() => actions.stop());
-          },
-        }),
-      ),
-    );
-    body.append(dialNode, facts);
-
     if (editing && manageInPlace) {
-      root.classList.add("editing");
       editor.append(
         el(
           "div",
           { class: "editor-inner" },
           el("h4", { text: m("focus_shut_title") }),
-          shutEditor({ snapshot, update, onchange: draw }),
+          shutEditor({ snapshot, update, onchange: draw }).root,
         ),
       );
     }
@@ -325,15 +279,18 @@ export function focusCard({
     },
     dispose() {
       if (timer !== null) clearInterval(timer);
+      timer = null;
       document.removeEventListener("visibilitychange", pace);
     },
   };
 }
 
-/** The sites a focus round keeps shut. Suggestions come from the reader's own
- *  time, never from a list shipped with the extension. */
+/**
+ * The sites a focus round keeps shut. Suggestions come from the reader's own
+ * time, never from a list shipped with the extension.
+ */
 export function shutEditor({ snapshot, update, onchange }) {
-  const draftInput = el("input", {
+  const input = el("input", {
     type: "text",
     class: "field",
     inputmode: "url",
@@ -344,19 +301,21 @@ export function shutEditor({ snapshot, update, onchange }) {
     "aria-label": m("focus_shut_placeholder"),
   });
   const invalid = el("p", { class: "invalid", role: "alert", hidden: true }, m("focus_shut_invalid"));
-  const list = el("ul", { class: "shut-list", "aria-label": m("focus_shut_title") });
   const suggested = el("div", { class: "suggested" });
+  const list = el("ul", { class: "shut-list", "aria-label": m("focus_shut_title") });
 
   const save = (sites) => update({ shut: sites.slice(0, 256) });
 
-  const add = (input) => {
-    const site = normalizeSite(input);
+  const add = (value) => {
+    const site = normalizeSite(value);
     if (site === null) {
       invalid.hidden = false;
+      input.setAttribute("aria-invalid", "true");
       return;
     }
     invalid.hidden = true;
-    draftInput.value = "";
+    input.removeAttribute("aria-invalid");
+    input.value = "";
     const sites = snapshot().shut;
     if (!sites.includes(site)) void save([...sites, site]).then(onchange);
     onchange?.();
@@ -368,23 +327,18 @@ export function shutEditor({ snapshot, update, onchange }) {
       class: "add",
       onsubmit: (event) => {
         event.preventDefault();
-        add(draftInput.value);
+        add(input.value);
       },
     },
-    draftInput,
-    el(
-      "button",
-      { type: "submit", class: "submit" },
-      glyphs.plus(13),
-      m("focus_shut_add"),
-    ),
+    input,
+    el("button", { type: "submit", class: "button add-button" }, glyphs.plus(13), m("focus_shut_add")),
   );
 
-  const view = el("div", { class: "shut-editor" }, form, invalid, suggested, list);
+  const root = el("div", { class: "shut-editor" }, form, invalid, suggested, list);
 
   function render() {
     const snap = snapshot();
-    const sites = snap.shut;
+    const sites = snap.shut ?? [];
     fill(list);
     if (sites.length === 0) {
       list.append(el("li", { class: "none-row" }, m("focus_none_shut")));
@@ -415,14 +369,10 @@ export function shutEditor({ snapshot, update, onchange }) {
           offered.map((site) =>
             el(
               "button",
-              {
-                type: "button",
-                class: "chip",
-                onclick: () => add(site),
-              },
-              faviconMark(site, 14),
+              { type: "button", class: "chip", onclick: () => add(site) },
+              faviconMark(site, { size: 14 }),
               el("span", { text: site }),
-              glyphs.plus(12),
+              glyphs.plus(11),
             ),
           ),
         ),
@@ -431,34 +381,7 @@ export function shutEditor({ snapshot, update, onchange }) {
   }
 
   render();
-  return Object.assign(view, { render });
-}
-
-function faviconMark(site, size = 16) {
-  const image = el("img", {
-    class: "favicon",
-    alt: "",
-    width: size,
-    height: size,
-    loading: "lazy",
-    decoding: "async",
-    src: `https://icons.duckduckgo.com/ip3/${encodeURIComponent(site)}.ico`,
-  });
-  image.addEventListener("error", () => {
-    image.replaceWith(
-      el("span", {
-        class: "favicon letter",
-        style: {
-          inlineSize: `${size}px`,
-          blockSize: `${size}px`,
-          fontSize: `${Math.round(size * 0.6)}px`,
-        },
-        text: (site[0] ?? "?").toUpperCase(),
-        "aria-hidden": "true",
-      }),
-    );
-  });
-  return image;
+  return { root, render };
 }
 
 function covers(shut, site) {
