@@ -63,6 +63,11 @@ test("the icons are the shipped mark, at the sizes the manifest promises", () =>
     const file = resolve(ROOT, "src/pages", page, "..", href);
     assert.ok(existsSync(file), `${page} points its favicon at ${href}, which is missing`);
   }
+  // The preview is the page a person is most likely to see first.
+  const demo = readFileSync(join(ROOT, "demo/index.html"), "utf8");
+  const href = /<link rel="icon" href="([^"]+)"/u.exec(demo)?.[1];
+  assert.ok(href, "the preview has no favicon, so its tab shows a blank page icon");
+  assert.ok(existsSync(resolve(ROOT, "demo", href)), `the preview points its favicon at ${href}, which is missing`);
 });
 
 test("every token the sheets use is defined, and every theme defines the same names", () => {
