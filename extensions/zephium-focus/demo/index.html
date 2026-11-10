@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Zephium Focus — preview</title>
+    <link rel="stylesheet" href="../src/styles/tokens.css" />
+    <link rel="stylesheet" href="../src/pages/time/time.css" />
+    <style>
+      .demo-note {
+        position: fixed;
+        inset-block-end: 12px;
+        inset-inline-end: 12px;
+        padding: 6px 10px;
+        border-radius: var(--radius-capsule);
+        background: var(--color-surface);
+        box-shadow: var(--row-rim);
+        color: var(--color-muted);
+        font-size: var(--text-caption);
+        z-index: 20;
+      }
+    </style>
+  </head>
+  <body>
+    <!--
+      A preview of the Time page with sample figures, served from the same
+      modules and styles the extension ships: this document fetches the real
+      page's markup, stands in for the service worker, and imports the real
+      page script. Open it over HTTP (`node scripts/serve.mjs`), not file://.
+    -->
+    <div id="host"></div>
+    <p class="demo-note">Preview with sample data</p>
+    <script type="module" src="demo.js"></script>
+  </body>
+</html>
